@@ -1,0 +1,14 @@
+{
+  "name": "noor-system",
+  "version": "1.0.0",
+  "description": "نُور — نظام إدارة الحياة الشخصي (سيرفر محلي صفري الاعتماديات)",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "dependencies": {}
+}

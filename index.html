@@ -1,0 +1,143 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نُور — نظام إدارة الحياة</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="css/style.css?v=64">
+</head>
+<body>
+
+<!-- ===== بوابة الدخول (مستخدم واحد) ===== -->
+<div class="noor-lock" id="noorLock" role="dialog" aria-modal="true" aria-labelledby="lockTitle">
+  <div class="noor-lock__card" id="lockCard">
+    <div class="noor-lock__brand">
+      <span class="noor-lock__mark">ن</span>
+      <h1 class="noor-lock__title" id="lockTitle">نُور</h1>
+      <p class="noor-lock__sub">نظام إدارة الحياة — نسخة شخصية</p>
+    </div>
+    <form class="noor-lock__form" id="lockForm" autocomplete="off">
+      <label class="noor-lock__label" for="lockInput">رمز الدخول</label>
+      <input class="noor-lock__input" id="lockInput" type="password" placeholder="••••••••"
+             autocomplete="off" spellcheck="false" autofocus>
+      <p class="noor-lock__msg" id="lockMsg" hidden></p>
+      <button class="noor-lock__btn" type="submit">فتح نُور</button>
+    </form>
+    <p class="noor-lock__hint">هذه النسخة لمستخدم واحد.</p>
+  </div>
+</div>
+
+<div class="app">
+
+    <!-- ===== الشريط الجانبي ===== -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1 class="sidebar-title">نُور</h1>
+            <p class="sidebar-subtitle">نظام إدارة الحياة</p>
+            <div class="today-status" id="todayStatus">
+                <span class="status-dot" id="statusDot"></span>
+                <span id="statusText">…جارٍ التحميل</span>
+            </div>
+        </div>
+<nav class="nav">
+            <button class="nav-item" data-page="stats" title="الإحصائيات">
+                <span class="nav-number">01</span>
+                <span class="nav-name">الإحصائيات</span>
+                <span class="nav-hint">أين أنت الآن</span>
+            </button>
+            <button class="nav-item active" data-page="tasks" title="المهام اليومية">
+                <span class="nav-number">02</span>
+                <span class="nav-name">المهام اليومية</span>
+                <span class="nav-hint">ابدأ هنا — قائمة بسيطة</span>
+            </button>
+            <button class="nav-item" data-page="vision" title="النظرة">
+                <span class="nav-number">03</span>
+                <span class="nav-name">النظرة</span>
+                <span class="nav-hint">من أنت وإلى أين تتجه</span>
+            </button>
+            <button class="nav-item" data-page="timer" title="المؤقت">
+                <span class="nav-number">04</span>
+                <span class="nav-name">المؤقت</span>
+                <span class="nav-hint">ركّز الآن</span>
+            </button>
+            <button class="nav-item" data-page="journal" title="التدوين الشامل">
+                <span class="nav-number">05</span>
+                <span class="nav-name">التدوين الشامل</span>
+                <span class="nav-hint">وعي ذاتي، معرفة، مشاريع</span>
+            </button>
+            <button class="nav-item" data-page="projects" title="المشاريع">
+                <span class="nav-number">06</span>
+                <span class="nav-name">المشاريع</span>
+                <span class="nav-hint">مشاريع التركيز النشطة</span>
+            </button>
+            <button class="nav-item" data-page="library" title="المكتبة الشخصية">
+                <span class="nav-number">07</span>
+                <span class="nav-name">المكتبة الشخصية</span>
+                <span class="nav-hint">اقرأ وشاهد بلا تشتيت</span>
+            </button>
+            <button class="nav-item" data-page="archive" title="الأرشيف">
+                <span class="nav-number">08</span>
+                <span class="nav-name">الأرشيف</span>
+                <span class="nav-hint">لا شيء يضيع</span>
+            </button>
+        </nav>
+        <div class="sidebar-footer">
+            <button class="btn-sidebar" id="sidebarCloseBtn" onclick="toggleSidebar()" title="إخفاء القائمة الجانبية">
+                <span class="sb-ic">⇤</span><span class="sb-txt">إخفاء القائمة</span>
+            </button>
+            <button class="btn-sidebar" onclick="openSettings()"><span class="sb-ic">⚙</span><span class="sb-txt">الإعدادات</span></button>
+            <button class="btn-sidebar" id="soundBtn" onclick="toggleSound()" title="كتم الأصوات">
+                <span class="sb-ic">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M11 5 6 9H2v6h4l5 4V5z"></path>
+                        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                        <path d="M18.36 5.64a9 9 0 0 1 0 12.72"></path>
+                    </svg>
+                </span>
+                <span class="sb-txt">صوت</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- ===== مساحة العمل ===== -->
+    <main class="workspace">
+        <header class="workspace-header">
+            <div class="workspace-info">
+                <h2 class="workspace-title" id="page-title"></h2>
+                <p class="workspace-desc" id="page-desc"></p>
+            </div>
+            <div class="header-right">
+                <div class="workspace-date" id="top-date"></div>
+                <div class="workspace-clock" id="top-clock"></div>
+            <div class="fab-wrap" id="fabWrap">
+                <div class="fab-menu" id="fabMenu"></div>
+                <button class="fab" id="fabMain" onclick="toggleFabMenu()" title="إضافة سريعة" aria-expanded="false">
+                    <span class="fab-plus">＋</span><span class="fab-label">إضافة سريعة</span>
+                </button>
+                <button class="sidebar-toggle" onclick="toggleSidebar()" title="إظهار/إخفاء القائمة الجانبية">☰ القائمة</button>
+            </div>
+            </div>
+        </header>
+        <div class="content-area" id="content">
+            <div class="loading">…جارٍ التحميل</div>
+        </div>
+    </main>
+</div>
+
+<!-- ===== النافذة ===== -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-header">
+            <span class="modal-title" id="modalTitle"></span>
+            <button class="modal-close" onclick="closeModal()" aria-label="إغلاق النافذة" title="إغلاق">✕</button>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+    </div>
+</div>
+
+<div id="toasts"></div>
+
+        <script src="js/lock.js?v=1"></script>
+</body>
+</html>
