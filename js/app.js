@@ -101,6 +101,7 @@ const projectType = (k) => PROJECT_TYPES.find((t) => t.key === k) || PROJECT_TYP
    ═══════════════════════════════════════════════════════════════════ */
 const _imgCache = new Map();
 function cachedCover(src) {
+  src = assetUrl(src);
   if (!src) return '';
   if (_imgCache.has(src)) return _imgCache.get(src);
   try {
@@ -144,6 +145,14 @@ function setStarPick(el) {
 
 function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+/* مسار ملف محلي يبدأ بـ / يُحلّ نسبةً إلى صفحة الحالية كي يعمل تحت أي مسار فرعي
+   (مثل https://user.github.io/noor/) بدل جذر النطاق. الروابط الخارجية تبقى كما هي. */
+function assetUrl(u) {
+  var s = String(u || '');
+  if (!s || /^(?:[a-z][a-z0-9+.-]*:|\/\/|#|data:|blob:)/i.test(s)) return s;
+  return s.replace(/^\/+/, '');
 }
 
 function fileToBase64(file, maxW, maxH, cb) {
@@ -201,7 +210,7 @@ function projectFileLinkHTML(p) {
     <div class="lib-detail lib-detail-sm" style="margin-top:8px">
       <div class="lib-detail-body" style="flex-direction:row;align-items:center;gap:10px;flex-wrap:wrap">
         <span>📄 الملف المخزّن داخل النظام:</span>
-        <a class="btn btn-sm" href="${esc(p.file)}" target="_blank" rel="noopener" download="${esc(p.file_name || 'ملف')}">فتح «${esc(p.file_name || 'مرفق')}»</a>
+        <a class="btn btn-sm" href="${esc(assetUrl(p.file))}" target="_blank" rel="noopener" download="${esc(p.file_name || 'ملف')}">فتح «${esc(p.file_name || 'مرفق')}»</a>
       </div>
     </div>`;
 }
@@ -2299,7 +2308,7 @@ function libCoverHTML(p, big) {
     }
   }
   /* الغلاف = أول صفحة حقيقية من ملف PDF عبر عارض المتصفح المدمج — بلا مكتبات خارجية */
-  const f = String(p.file || '');
+  const f = assetUrl(p.file || '');
   if (f && /\.pdf($|\?)/i.test(f) && !/^data:/i.test(f)) {
     const src = f + '#page=1&toolbar=0&navpanes=0&scrollbar=0&statusbar=0&view=FitH';
     return `<div class="${big ? 'lib-cover-big' : 'lib-cover'} lib-cover-pdf"><iframe src="${esc(src)}" title="أول صفحة — ${esc(p.name)}" scrolling="no" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>`;
@@ -2366,7 +2375,7 @@ function openLibReader(id) {
     inner = libVideoEmbed(yt, p.name);
     isVideo = true;
   } else if (p.file) {
-    inner = `<iframe class="lib-frame" src="${esc(p.file)}" title="قارئ ${esc(p.name)}"></iframe>`;
+    inner = `<iframe class="lib-frame" src="${esc(assetUrl(p.file))}" title="قارئ ${esc(p.name)}"></iframe>`;
   } else if (p.link) {
     inner = `<div class="empty" style="padding:30px"><p>رابط خارجي غير قابل للتضمين</p><a class="btn" href="${esc(p.link)}" target="_blank" rel="noopener">🔗 فتح الرابط</a></div>`;
   } else {
@@ -3396,13 +3405,14 @@ function renderMaterialPanel() {
     if (vsrc) mainMedia = `<div class="mt-media"><div class="st-video" id="mt-mat-fs"><iframe src="${esc(vsrc)}" title="فيديو المادة" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen playsinline></iframe></div><div style="margin-top:4px;text-align:end"><button class="btn btn-xs btn-ghost" onclick="fsToggle('mt-mat-fs')">⛶ ملء الشاشة</button></div></div>`;
     else mainMedia = `<div class="mt-media"><a class="btn btn-xs" href="${esc(mat.video_url)}" target="_blank" rel="noopener">🎬 فتح رابط الفيديو</a></div>`;
   } else if (mat.pdf_url || mat.url) {
-    const u = mat.pdf_url || mat.url;
+    const u = assetUrl(mat.pdf_url || mat.url);
     if (isPDFURL(u)) mainMedia = `<div class="mt-media"><iframe class="mt-pdf" src="${esc(u)}" title="PDF" loading="lazy"></iframe></div>`;
     else if (isImageURL(u)) mainMedia = `<div class="mt-media"><img class="mt-img" src="${esc(u)}" alt="${esc(mat.title)}" loading="lazy"></img></div>`;
     else mainMedia = `<div class="mt-media"><a class="btn btn-xs" href="${esc(u)}" target="_blank" rel="noopener">فتح الملف</a></div>`;
   } else if (mat.file) {
-    if (isPDFURL(mat.file)) mainMedia = `<div class="mt-media"><iframe class="mt-pdf" src="${esc(mat.file)}" title="${esc(mat.file_name || 'ملف')}" loading="lazy"></iframe></div>`;
-    else mainMedia = `<div class="mt-media"><a class="btn btn-xs" href="${esc(mat.file)}" target="_blank" rel="noopener">📖 فتح الملف: ${esc(mat.file_name || 'ملف مرفق')}</a></div>`;
+    const mf = assetUrl(mat.file);
+    if (isPDFURL(mf)) mainMedia = `<div class="mt-media"><iframe class="mt-pdf" src="${esc(mf)}" title="${esc(mat.file_name || 'ملف')}" loading="lazy"></iframe></div>`;
+    else mainMedia = `<div class="mt-media"><a class="btn btn-xs" href="${esc(mf)}" target="_blank" rel="noopener">📖 فتح الملف: ${esc(mat.file_name || 'ملف مرفق')}</a></div>`;
   }
   if (mainMedia) h += mainMedia;
   h += `<div class="st-sec">مهام المادة — ${done}/${tasks.length}</div>`;
@@ -3488,7 +3498,7 @@ async function renderMaterialsBody() {
               <span class="muted">🎬 فيديو</span>
             </div>` : ''}
             ${m.file ? `<div class="st-src-item">
-              <a class="btn btn-xs" href="${esc(m.file)}" target="_blank" rel="noopener">📖 فتح الملف</a>
+              <a class="btn btn-xs" href="${esc(assetUrl(m.file))}" target="_blank" rel="noopener">📖 فتح الملف</a>
               <span class="muted">${esc(m.file_name || 'ملف مرفق')}</span>
             </div>` : ''}
           </div>
@@ -3693,7 +3703,7 @@ function renderSessionTasks() {
   else if (p && (p.video_url || (p.video_urls && p.video_urls.length) || p.file || p.link)) {
     const isVidP = p.type === 'فيديو' || p.type === 'كورس';
     const allVids = (p.video_urls && p.video_urls.length) ? p.video_urls : (p.video_url ? [p.video_url] : []);
-    const srcUrl = (isVidP ? (allVids[0] || p.file || p.link) : (p.file || p.link || allVids[0] || '')) || '';
+    const srcUrl = assetUrl((isVidP ? (allVids[0] || p.file || p.link) : (p.file || p.link || allVids[0] || '')) || '');
     const vidId = ytVideoId(srcUrl);
     const playerHTML2 = liveFrame ? '' : (vidId ? ytThumbHTML(vidId, 0) : '');
     const label = p.file && !isVidP ? '📖 كتاب «' + esc(p.name) + '» — اقرأ بجانب المؤقت' : '▶️ «' + esc(p.name) + '» — شاهده بجانب المؤقت';
