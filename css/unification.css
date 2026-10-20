@@ -181,11 +181,11 @@ textarea {
   border-color: var(--green);
 }
 #content .btn-sm,
-#modalOverlay .btn-sm { min-height: var(--ui-control-height-sm); padding: var(--space-2) var(--space-3); font-size: var(--fs-sm); }
+#modalOverlay .btn-sm { min-height: var(--ui-control-height-sm); padding: 6px var(--space-3); font-size: var(--fs-sm); }
 #content .btn-xs,
-#modalOverlay .btn-xs { min-height: 32px; padding: 5px var(--space-2-5); font-size: var(--fs-xs); }
+#modalOverlay .btn-xs { min-height: 32px; padding: 4px var(--space-2-5); font-size: var(--fs-xs); }
 #content .btn-lg,
-#modalOverlay .btn-lg { min-height: 48px; padding: var(--space-3) var(--space-5); font-size: var(--fs-md); }
+#modalOverlay .btn-lg { min-height: 48px; padding: 9px var(--space-5); font-size: var(--fs-md); }
 #content .btn:disabled,
 #content .icon-btn:disabled,
 #modalOverlay .btn:disabled { opacity: .5; cursor: not-allowed; box-shadow: none; }
@@ -640,4 +640,23 @@ textarea {
 @media (max-width: 700px) {
   #content .archive-filters { grid-template-columns: minmax(0, 1fr); }
   #content .archive-filters .input { min-width: 0; }
+}
+
+
+/* Inputs paired with an image picker share a 44px control height and internal padding. */
+#content .cover-picker-row > .cover-url-input,
+#content .field-row:has(#pj-cover-file) > input.input,
+#content .field-row:has(#pd-cover-file) > input.input,
+#content .field-row:has(#post-cover-file) > input.input {
+  height: 44px;
+  min-height: 44px;
+  padding: 7px var(--space-3);
+  line-height: 1.3;
+}
+/* Keep compact button labels vertically centered in the same control height. */
+#content .cover-picker-row > .btn,
+#content .field-row:has(#pj-cover-file) > button.btn,
+#content .field-row:has(#pd-cover-file) > button.btn,
+#content .field-row:has(#post-cover-file) > button.btn {
+  padding: 4px var(--space-2);
 }
