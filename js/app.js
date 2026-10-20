@@ -4941,7 +4941,7 @@ function visionBodyHTML() {
     const yearChip = y === curYear ? '<span class="chip chip-warn">أنت هنا</span>' : (y < curYear && ys.pct >= 100 ? '<span class="chip chip-done">✅ اكتملت</span>' : '');
     hier += `
       <div id="vision-year-${y}" class="yh ${stateCls}">
-        <div class="yh-head" role="button" tabindex="0" aria-expanded="${y === curYear ? 'true' : 'false'}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleYh(this)}" onclick="toggleYh(this)" title="${y === curYear ? 'طي السنة' : 'فتح السنة'}">
+        <div class="yh-head" role="button" tabindex="0" aria-expanded="${y === curYear ? 'true' : 'false'}" onkeydown="if(event.target===this&&(event.key==='Enter'||event.key===' ')){event.preventDefault();toggleYh(this)}" onclick="toggleYh(this)" title="${y === curYear ? 'طي السنة' : 'فتح السنة'}">
           <div class="yh-ring">
             <svg class="ring" viewBox="0 0 48 48" width="48" height="48" aria-hidden="true">
               <circle class="bg" cx="24" cy="24" r="18"></circle>
