@@ -3,7 +3,7 @@
    الغيّر من هنا: */
 (function () {
   var CFG = {
-    enabled: true,
+    enabled: false,
     /* SHA-256 للرمز (حرف-sensitive). ولّد رمزًا جديدًا بأمر:
        node -e "console.log(require('crypto').createHash('sha256').update('رمزك هنا','utf8').digest('hex'))" */
     passSha256: '43d998f7250ec60051b1e0b13acdf29f7394441680f17d54aa48fc40b29345d0',
@@ -123,8 +123,7 @@
         s2.src = CFG.appSrc; s2.async = false;
         document.body.appendChild(s2);
       };
-      if (unlocked()) seedIfEmpty().then(ready, ready);
-      else ready();
+      seedIfEmpty().then(ready, ready);
     };
   }
 
