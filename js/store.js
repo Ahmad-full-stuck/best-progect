@@ -1934,7 +1934,7 @@
     barrier_tasks: ['id', 'title', 'category', 'active', 'sort', 'archived_at', 'created_at'],
     barrier_hosts: ['id', 'title', 'active', 'sort', 'archived_at', 'created_at'],
     notes: ['id', 'text', 'archived_at', 'created_at'],
-    posts: ['id', 'space', 'sub', 'title', 'text', 'cover', 'author', 'rating', 'steps', 'completed_at', 'archived_at', 'created_at', 'updated_at']
+    posts: ['id', 'space', 'sub', 'title', 'text', 'cover', 'link', 'author', 'rating', 'steps', 'tags', 'completed_at', 'archived_at', 'created_at', 'updated_at']
   };
   /* جدول التحديات يُنظَّف يدويًا في restore() لأن done_dates مصفوفة نصوص تواريخ */
   var RESTORE_NUM = ['id', 'project_id', 'src_id', 'goal_id', 'subgoal_id', 'value_id', 'sort', 'priority', 'week', 'weeks', 'minutes', 'target_pct', 'year', 'done', 'carried', 'active', 'hours'];
