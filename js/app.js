@@ -1347,7 +1347,7 @@ async function saveGoal(id) {
 
 function refreshGoalsViews() {
   if (state.page === 'journal') renderJournal().catch(function (e) { console.error(e); });
-  else if (state.page === 'vision') renderVision().catch(function (e) { console.error(e); });
+  else if (state.page === 'vision') renderVision();
   else if (state.page === 'stats') renderStats().catch(function (e) { console.error(e); });
 }
 
@@ -5494,6 +5494,7 @@ async function saveVisionField(field, inputId) {
     state.settings = NoorStore.getSettings();
     play('success');
     showToast('تم الحفظ');
+    if (state.page === 'vision') renderVision();
   } catch (err) { showToast(err.message, 'bad'); }
 }
 
@@ -5524,7 +5525,7 @@ async function saveNote() {
 }
 
 async function archiveNoteItem(id) {
-  if (!confirm('حذف هذه الفكرة؟')) return;
+  if (!confirm('أرشفة هذه الفكرة؟ ستبقى في الأرشيف ويمكنك الرجوع إليها.')) return;
   try {
     play('tick');
     NoorStore.archiveNote(id);
