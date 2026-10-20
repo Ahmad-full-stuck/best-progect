@@ -1852,6 +1852,13 @@
         shDone[kk] = ls.getItem(kk);
       }
     }
+    var rewardClaims = {};
+    for (var n = 0; n < (ls ? ls.length : 0); n++) {
+      var rk = ls.key(n);
+      if (rk && rk.indexOf('noor_reward_claims_') === 0) rewardClaims[rk] = ls.getItem(rk);
+    }
+    var sessionTasks = null;
+    try { sessionTasks = ls ? ls.getItem('noor_session_tasks_v1') : null; } catch (e) {}
     /* المخزن المحلي الموحد (واجهة API المحلية): مشاعر/قرارات/تجارب/تصنيفات/حالة التحدي/سجلات العادات */
     var apiDb = null;
     try { apiDb = JSON.parse(ls.getItem('noor_local_api') || 'null'); } catch (e) { apiDb = null; }
@@ -1877,6 +1884,8 @@
         journal: journalData,
         barrier_done: barrierDone,
         simple_habit_done: shDone,
+        reward_claims: rewardClaims,
+        session_tasks: sessionTasks,
         api: apiDb && typeof apiDb === 'object' ? apiDb : null
       }
     };
@@ -1964,9 +1973,9 @@
   function restore(data) {
     if (!data || data.app !== 'noor' || !data.data || !data.data.settings) throw new Error('ملف نسخة غير صالح');
     var d = data.data;
-    /* المفاتيح الغائبة من النسخة (نسخ أقدم) لا تفرّغ الجداول الحالية — المحضورة تبقى كما هي */
+    /* الاستعادة استبدال كامل للحالة: لا نخلط السجلات الجديدة مع نسخة أقدم. */
     function table(key) {
-      return d[key] === undefined ? db[key] : cleanRestoreRows(d[key], key);
+      return cleanRestoreRows(Array.isArray(d[key]) ? d[key] : [], key);
     }
     db = {
       settings: Object.assign({}, DEFAULTS),
@@ -1983,38 +1992,81 @@
       barrier_tasks: table('barrier_tasks'),
       barrier_hosts: table('barrier_hosts'),
       notes: table('notes'),
-      posts: table('posts')
+      posts: table('posts'),
+      challenges: (Array.isArray(d.challenges) ? d.challenges : [])
+        .map(function (c) { return c && typeof c === 'object' ? cleanChallenge(c) : null; })
+        .filter(function (c) { return c && c.title; }),
+      experiences: [],
+      exp_categories: []
     };
-    db.challenges = d.challenges === undefined ? (db.challenges || []) : ((Array.isArray(d.challenges) ? d.challenges : [])
-      .map(function (c) { return c && typeof c === 'object' ? cleanChallenge(c) : null; })
-      .filter(function (c) { return c && c.title; }));
     for (var k in DEFAULTS) {
       if (d.settings && d.settings[k] !== undefined) db.settings[k] = String(d.settings[k]);
       else db.settings[k] = DEFAULTS[k];
     }
-    save();
+
     var ls = journalStorage();
-    if (ls && d.journal) {
-      if (d.journal.questions && Array.isArray(d.journal.questions)) ls.setItem(JOURNAL_QKEY, JSON.stringify(d.journal.questions));
-      if (d.journal.entries && typeof d.journal.entries === 'object') {
-        Object.keys(d.journal.entries).forEach(function (dateKey) {
-          ls.setItem(JOURNAL_PREFIX + dateKey, JSON.stringify(d.journal.entries[dateKey]));
+    if (ls) {
+      /* امسح النسخة الجانبية السابقة قبل تحميل الجديدة، مع حماية نسخة استرداد إعادة الضبط وتفضيل الشريط الجانبي. */
+      var removeKeys = [];
+      for (var i = 0; i < ls.length; i++) {
+        var key = ls.key(i);
+        if (!key || key === 'noor_db_v1' || key === 'noor_factory_reset_backup' ||
+            key === 'noor_hide_sidebar' || key === 'noor_merged_v1') continue;
+        if (key === JOURNAL_QKEY || key.indexOf(JOURNAL_PREFIX) === 0 ||
+            key === 'noor_feelings' || key === 'noor_decisions' || key === 'noor_experiences' ||
+            key.indexOf('noor_barrier_done_') === 0 || key.indexOf('noor_sh_done_') === 0 ||
+            key.indexOf('noor_barrier_host_') === 0 || key.indexOf('noor_reward_claims_') === 0 ||
+            key === 'noor_session_tasks_v1' || key === 'noor_local_api' ||
+            key === 'noor_last_change' || key === 'noor_dirty') {
+          removeKeys.push(key);
+        }
+      }
+      removeKeys.forEach(function (key) { ls.removeItem(key); });
+
+      if (d.journal && typeof d.journal === 'object') {
+        if (Array.isArray(d.journal.questions)) ls.setItem(JOURNAL_QKEY, JSON.stringify(d.journal.questions));
+        if (d.journal.entries && typeof d.journal.entries === 'object') {
+          Object.keys(d.journal.entries).forEach(function (dateKey) {
+            if (/^\\d{4}-\\d{2}-\\d{2}$/.test(dateKey)) {
+              ls.setItem(JOURNAL_PREFIX + dateKey, JSON.stringify(d.journal.entries[dateKey]));
+            }
+          });
+        }
+        ['feelings', 'decisions', 'experiences'].forEach(function (kind) {
+          if (Array.isArray(d.journal[kind])) ls.setItem('noor_' + kind, JSON.stringify(d.journal[kind]));
         });
       }
-      if (d.journal.feelings) ls.setItem('noor_feelings', JSON.stringify(d.journal.feelings));
-      if (d.journal.decisions) ls.setItem('noor_decisions', JSON.stringify(d.journal.decisions));
-      if (d.journal.experiences) ls.setItem('noor_experiences', JSON.stringify(d.journal.experiences));
+      if (d.barrier_done && typeof d.barrier_done === 'object') {
+        Object.keys(d.barrier_done).forEach(function (dateKey) {
+          if (/^\\d{4}-\\d{2}-\\d{2}$/.test(dateKey)) {
+            ls.setItem('noor_barrier_done_' + dateKey, String(d.barrier_done[dateKey]));
+          }
+        });
+      }
+      if (d.simple_habit_done && typeof d.simple_habit_done === 'object') {
+        Object.keys(d.simple_habit_done).forEach(function (key) {
+          if (key.indexOf('noor_sh_done_') === 0) ls.setItem(key, String(d.simple_habit_done[key]));
+        });
+      }
+      if (d.reward_claims && typeof d.reward_claims === 'object') {
+        Object.keys(d.reward_claims).forEach(function (key) {
+          if (key.indexOf('noor_reward_claims_') === 0) ls.setItem(key, String(d.reward_claims[key]));
+        });
+      }
+      if (typeof d.session_tasks === 'string' && d.session_tasks) {
+        ls.setItem('noor_session_tasks_v1', d.session_tasks);
+      }
+      /* المخزن المحلي الموحد: استرجع النسخة كاملة، أو أنشئ مخزنًا نظيفًا لنسخ الإصدارات القديمة. */
+      var apiSnapshot = d.api && typeof d.api === 'object' ? d.api : {};
+      if (!(d.api && typeof d.api === 'object') && d.journal) {
+        ['feelings', 'decisions', 'experiences'].forEach(function (kind) {
+          if (Array.isArray(d.journal[kind])) apiSnapshot[kind] = d.journal[kind].slice();
+        });
+      }
+      ls.setItem('noor_local_api', JSON.stringify(apiSnapshot));
     }
-    if (ls && d.barrier_done && typeof d.barrier_done === 'object') {
-      Object.keys(d.barrier_done).forEach(function (dd) { ls.setItem('noor_barrier_done_' + dd, d.barrier_done[dd]); });
-    }
-    if (ls && d.simple_habit_done && typeof d.simple_habit_done === 'object') {
-      Object.keys(d.simple_habit_done).forEach(function (sk) { ls.setItem(sk, d.simple_habit_done[sk]); });
-    }
-    /* إعادة المخزن المحلي الموحد (يحل محل القديم كاملًا) */
-    if (ls && d.api && typeof d.api === 'object') {
-      try { ls.setItem('noor_local_api', JSON.stringify(d.api)); } catch (e) {}
-    }
+    /* اكتب اللقطة بعد تحميل كل الجداول الجانبية حتى لا تُدفع نسخة ناقصة إلى الخادم. */
+    save();
   }
 
   function archiveAll() {
