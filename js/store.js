@@ -2027,7 +2027,7 @@
         if (Array.isArray(d.journal.questions)) ls.setItem(JOURNAL_QKEY, JSON.stringify(d.journal.questions));
         if (d.journal.entries && typeof d.journal.entries === 'object') {
           Object.keys(d.journal.entries).forEach(function (dateKey) {
-            if (/^\\d{4}-\\d{2}-\\d{2}$/.test(dateKey)) {
+            if (/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(dateKey)) {
               ls.setItem(JOURNAL_PREFIX + dateKey, JSON.stringify(d.journal.entries[dateKey]));
             }
           });
@@ -2038,7 +2038,7 @@
       }
       if (d.barrier_done && typeof d.barrier_done === 'object') {
         Object.keys(d.barrier_done).forEach(function (dateKey) {
-          if (/^\\d{4}-\\d{2}-\\d{2}$/.test(dateKey)) {
+          if (/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(dateKey)) {
             ls.setItem('noor_barrier_done_' + dateKey, String(d.barrier_done[dateKey]));
           }
         });
