@@ -1,0 +1,259 @@
+/* نُور — تحسينات واجهة موحّدة، مع الحفاظ على الألوان والخطوط والأسلوب الكلاسيكي */
+:root {
+  --noor-hover-bg: var(--wash-warm);
+  --noor-hover-border: var(--accent);
+  --noor-hover-shadow: var(--shadow-md);
+}
+
+/* استجابة موحّدة عند المرور والتحديد، دون تحويل الواجهة إلى تصميم دائري أو مبالغ */
+.nav-item,
+.lib-card,
+.pcard,
+.space-card,
+.sec-card,
+.jtab,
+.dash-kpi,
+.dash-card,
+.journal-item,
+.jday-item,
+.project-node,
+.note-card,
+.knowledge-post-card,
+.yh-head,
+.ycell,
+.btn-sidebar,
+.btn,
+.icon-btn {
+  transition-property: color, background-color, border-color, box-shadow, transform;
+  transition-duration: .16s;
+  transition-timing-function: ease;
+}
+
+.lib-card:hover,
+.pcard:hover,
+.space-card:hover,
+.sec-card:hover,
+.dash-kpi:hover,
+.journal-item:hover,
+.jday-item:hover,
+.note-card:hover,
+.knowledge-post-card:hover {
+  background: var(--noor-hover-bg);
+  border-color: var(--noor-hover-border);
+  box-shadow: var(--noor-hover-shadow);
+}
+
+.lib-card:focus-within,
+.pcard:focus-within,
+.space-card:focus-within,
+.sec-card:focus-within,
+.dash-kpi:focus-visible,
+.knowledge-post-card:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* الإحصائيات: بطاقات أكثر وضوحًا وتماسكًا مع بطاقة المشروع */
+.dash-kpis { align-items: stretch; gap: var(--space-3); }
+.dash-kpi {
+  min-width: 0;
+  min-height: 104px;
+  justify-content: space-between;
+  border-width: var(--border-w);
+  box-shadow: var(--shadow-sm);
+  transition: background-color .16s ease, border-color .16s ease, box-shadow .16s ease, transform .16s ease;
+}
+.dash-kpi:hover {
+  border-color: var(--accent);
+  background: var(--wash-warm);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+.dk-num { overflow-wrap: anywhere; }
+.dk-label { line-height: 1.5; }
+.dash-card-head { min-height: 54px; }
+.dash-card-head .card-title { line-height: 1.45; }
+
+/* النظرة: تثبيت إيقاع صفوف السنوات ووضوح السنة الحالية */
+.vn-years { overflow: hidden; }
+.yh { min-width: 0; }
+.yh-head { min-height: 78px; gap: var(--space-3); }
+.yh-head:hover {
+  background: var(--wash-warm);
+  box-shadow: inset -3px 0 0 var(--accent);
+}
+.yh.cur > .yh-head {
+  background: var(--accent-soft);
+}
+.yh.cur > .yh-head:hover { background: var(--wash-warm); }
+.yh-info { overflow-wrap: anywhere; }
+.yh-title { line-height: 1.45; }
+.yh-head > .btn { flex: 0 0 auto; }
+.yh-body { min-width: 0; }
+.yh-branches { flex-wrap: wrap; }
+.yline {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+  gap: var(--space-2);
+  align-items: stretch;
+}
+.ycell {
+  width: 100%;
+  min-width: 0;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+}
+.ycell.cur { font-weight: 900; }
+.yh-head:focus-visible,
+.ycell:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* مستودع المعرفة: إضافة واضحة، بطاقات موحّدة، ونصوص قابلة للقراءة */
+.knowledge-toolbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  padding: var(--space-4);
+  margin: var(--space-3) 0;
+  background: var(--surface-2);
+  border: var(--border-w) solid var(--border-light);
+  border-inline-start: 4px solid var(--accent-alt);
+}
+.knowledge-toolbar-copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 180px;
+  flex: 1 1 240px;
+}
+.knowledge-toolbar-copy > strong {
+  font-family: var(--font-title);
+  font-size: var(--fs-lg);
+  line-height: 1.45;
+}
+.knowledge-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+.knowledge-actions .btn { max-width: 100%; }
+.knowledge-filters { margin-block: var(--space-3) var(--space-4); }
+.knowledge-grid { align-items: stretch; }
+.knowledge-post-card { min-width: 0; }
+.knowledge-post-card .lib-cover { flex: 0 0 150px; }
+.knowledge-post-card .lib-body { flex: 1 1 auto; min-width: 0; }
+.knowledge-post-card .lib-title { overflow-wrap: anywhere; }
+.knowledge-post-card .lib-summary { white-space: normal; overflow-wrap: anywhere; }
+.knowledge-post-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-2-5) var(--space-3);
+  border-top: var(--border-w) solid var(--border-light);
+  background: var(--surface-2);
+}
+.knowledge-post-actions .btn { flex: 1 1 auto; min-width: 68px; }
+.knowledge-source-open {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-block: var(--space-3);
+  padding: var(--space-3);
+  background: var(--surface-2);
+  border: var(--border-w) solid var(--border-light);
+  overflow-wrap: anywhere;
+}
+.knowledge-source-open .count { min-width: 0; overflow-wrap: anywhere; }
+.knowledge-empty { margin-top: var(--space-3); }
+.knowledge-empty .knowledge-actions { margin-top: var(--space-3); }
+
+/* حقلا اختيار الغلاف وإدخال الرابط: مساحة وارتفاع موحّدان */
+.cover-picker-row,
+.field-row:has(#pj-cover-file),
+.field-row:has(#pd-cover-file),
+.field-row:has(#post-cover-file) {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.field-row:has(#pj-cover-file) > .cover-picker-button,
+.field-row:has(#pj-cover-file) > button.btn,
+.field-row:has(#pj-cover-file) > input.input,
+.field-row:has(#pd-cover-file) > .cover-picker-button,
+.field-row:has(#pd-cover-file) > button.btn,
+.field-row:has(#pd-cover-file) > input.input,
+.field-row:has(#post-cover-file) > .cover-picker-button,
+.field-row:has(#post-cover-file) > button.btn,
+.field-row:has(#post-cover-file) > input.input,
+.cover-picker-row > .cover-picker-button,
+.cover-picker-row > .cover-url-input {
+  flex: 1 1 0;
+  width: 0;
+  min-width: 0;
+  height: 44px;
+  min-height: 44px;
+  box-sizing: border-box;
+}
+.cover-picker-row > .btn,
+.field-row:has(#pj-cover-file) > button.btn,
+.field-row:has(#pd-cover-file) > button.btn,
+.field-row:has(#post-cover-file) > button.btn {
+  padding-inline: var(--space-2);
+  white-space: normal;
+  line-height: 1.35;
+}
+.cover-picker-row .cover-url-input,
+.field-row:has(#pj-cover-file) > input.input,
+.field-row:has(#pd-cover-file) > input.input,
+.field-row:has(#post-cover-file) > input.input {
+  background: var(--surface-2);
+}
+.cover-picker-row .cover-url-input:focus,
+.field-row:has(#pj-cover-file) > input.input:focus,
+.field-row:has(#pd-cover-file) > input.input:focus,
+.field-row:has(#post-cover-file) > input.input:focus {
+  background: var(--white);
+}
+
+/* تحسين استخدام الواجهة على الشاشات الضيقة دون تغيير مظهر سطح المكتب */
+@media (max-width: 700px) {
+  .dash-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .yh-head { min-height: 68px; padding: var(--space-3); gap: var(--space-2); }
+  .yh-head > .btn { padding-inline: var(--space-2); font-size: var(--fs-xs); }
+  .yh-title { font-size: var(--fs-base); }
+  .yh-info { min-width: 0; }
+  .yline { grid-template-columns: repeat(auto-fill, minmax(32px, 1fr)); }
+  .knowledge-toolbar { padding: var(--space-3); }
+  .knowledge-actions .btn { flex: 1 1 auto; }
+  .knowledge-post-actions .btn { min-width: 0; }
+}
+@media (max-width: 420px) {
+  .dash-kpis { gap: var(--space-2); }
+  .dash-kpi { min-height: 92px; padding: var(--space-2); }
+  .dk-num { font-size: var(--fs-lg); }
+  .knowledge-actions .btn { font-size: var(--fs-xs); padding-inline: var(--space-2); }
+  .cover-picker-row,
+  .field-row:has(#pj-cover-file),
+  .field-row:has(#pd-cover-file),
+  .field-row:has(#post-cover-file) { gap: 6px; }
+  .cover-picker-row > .btn,
+  .field-row:has(#pj-cover-file) > button.btn,
+  .field-row:has(#pd-cover-file) > button.btn,
+  .field-row:has(#post-cover-file) > button.btn { font-size: var(--fs-xs); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-item, .lib-card, .pcard, .space-card, .sec-card, .jtab, .dash-kpi,
+  .dash-card, .journal-item, .jday-item, .project-node, .note-card, .btn, .icon-btn {
+    transition: none !important;
+  }
+}
