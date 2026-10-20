@@ -226,3 +226,26 @@ button, input, select, textarea { font-family: var(--font); }
   padding: 6px 10px;
   line-height: 1.2;
 }
+
+
+/* مؤشرات اختيار الأيام وأنماط المؤقت: هوية المرور موحدة مع بقية النظام مع الإبقاء على النمط النشط. */
+#content .mode-tab:hover:not(.active),
+#modalOverlay .mode-tab:hover:not(.active),
+#content .day-opt:hover:not(:has(input:checked)),
+#modalOverlay .day-opt:hover:not(:has(input:checked)) {
+  background: var(--wash-warm);
+  border-color: var(--accent);
+  color: var(--accent-hover);
+}
+#content .mode-tab.active:hover,
+#modalOverlay .mode-tab.active:hover {
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--white);
+}
+#content .day-opt:has(input:checked):hover,
+#modalOverlay .day-opt:has(input:checked):hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--white);
+}
