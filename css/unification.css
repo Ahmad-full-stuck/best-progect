@@ -102,7 +102,7 @@ textarea {
   line-height: 1.4;
   letter-spacing: 0;
   white-space: normal;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
   transition:
     color var(--ui-motion),
     background-color var(--ui-motion),
@@ -440,10 +440,10 @@ textarea {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
-#content a:not(.btn),
-#modalOverlay a:not(.btn) { color: var(--accent-hover); text-underline-offset: 3px; }
-#content a:not(.btn):hover,
-#modalOverlay a:not(.btn):hover { color: var(--accent); }
+#content a:not(.btn):not(.tag):not(.chip),
+#modalOverlay a:not(.btn):not(.tag):not(.chip) { color: var(--accent-hover); text-underline-offset: 3px; }
+#content a:not(.btn):not(.tag):not(.chip):hover,
+#modalOverlay a:not(.btn):not(.tag):not(.chip):hover { color: var(--accent); }
 #content button,
 #content a,
 #modalOverlay button,
@@ -515,4 +515,129 @@ textarea {
   height: 44px;
   min-height: 44px;
   line-height: 1.25;
+}
+
+
+/* Projects: type labels are metadata, not a different color theme per card. */
+#content .pcard-tags .chip-blue,
+#content .pcard-tags .chip-warn,
+#content .pcard-tags .chip-gray {
+  background: var(--surface-2);
+  color: var(--ink-2);
+  border-color: var(--border-light);
+}
+#content .pcard-tags .tag {
+  border-radius: 0;
+}
+#content .pcard-tags .tag.gray {
+  background: var(--surface-2);
+  color: var(--ink-3);
+  border-color: var(--border-light);
+}
+
+/* A single selected-state treatment for the personal library filter cards. */
+#content .lib-stat-card {
+  border: 1px solid var(--border-light);
+  border-radius: 0;
+  box-shadow: var(--shadow-sm);
+  text-align: start;
+}
+#content .lib-stat-card:hover {
+  border-color: var(--accent);
+  background: var(--wash-warm);
+  box-shadow: var(--shadow-md);
+}
+#content .lib-stat-card.on {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+#content .lib-stat-card.on .lib-stat-label { color: var(--accent-hover); }
+#content .lib-stat-total {
+  background: var(--accent-soft);
+  border-color: var(--accent-l2);
+  cursor: default;
+}
+#content .lib-stat-total:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent-l2);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Daily tasks: match the system's square card language while retaining clear completion color. */
+#content .task {
+  border: 1px solid var(--border-light);
+  border-radius: 0;
+  background: var(--white);
+  box-shadow: var(--shadow-sm);
+  transition: background-color var(--ui-motion), border-color var(--ui-motion), box-shadow var(--ui-motion);
+}
+#content .task:hover {
+  background: var(--wash-warm);
+  border-color: var(--accent);
+  box-shadow: var(--shadow-md);
+}
+#content .task.is-done {
+  background: var(--green-soft);
+  border-color: var(--green);
+  box-shadow: none;
+}
+#content .task.is-done:hover { background: var(--green-soft); }
+#content .task-check {
+  width: 36px;
+  height: 36px;
+  border-radius: 0;
+  border: 1px solid var(--border-light);
+  background: var(--white);
+}
+#content .task-check:hover {
+  border-color: var(--green);
+  background: var(--green-soft);
+  color: var(--green);
+}
+#content .task.is-done .task-check {
+  background: var(--green);
+  color: var(--white);
+  border-color: var(--green);
+}
+
+/* Archive: one filter panel and one repeated row style; history heat colors stay meaningful. */
+#content .archive-filters {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(130px, 220px) minmax(130px, 180px);
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  padding: var(--space-3);
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+}
+#content .archive-filters .input { width: 100%; min-width: 0; }
+#content .archive-row {
+  min-width: 0;
+  border-bottom: 1px solid var(--border-light);
+  background: var(--white);
+  transition: background-color var(--ui-motion), border-color var(--ui-motion);
+}
+#content .archive-row:hover {
+  background: var(--wash-warm);
+  border-color: var(--accent);
+}
+#content .past-day { border-color: var(--border-light); box-shadow: var(--shadow-sm); }
+#content .past-day > summary { transition: background-color var(--ui-motion), color var(--ui-motion); }
+#content .past-day > summary:hover { background: var(--wash-warm); color: var(--ink); }
+#content .hist-cell {
+  border-color: var(--border-light);
+  box-shadow: none;
+}
+#content .hist-cell:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Responsive archive filters: preserve readable controls instead of squeezing them. */
+@media (max-width: 700px) {
+  #content .archive-filters { grid-template-columns: minmax(0, 1fr); }
+  #content .archive-filters .input { min-width: 0; }
 }
