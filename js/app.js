@@ -6793,8 +6793,10 @@ function journalSections(key) {
 }
 
 /* ===== مساحة تجميع المعرفة: مشاريع ومواد ومصادر وروابط محفوظة ===== */
+let knowledgeSearchTerm = '';
 function renderKnowledgeView(m) {
   const f = spaceFilters.knowledge || 'all';
+  const query = String(knowledgeSearchTerm || '').trim().toLocaleLowerCase();
   const projects = NoorStore.getProjects().filter((p) => ['كتاب', 'فيديو', 'كورس'].includes(p.type));
   const experiences = state.journalSrv.experiences || [];
   const posts = (NoorStore.getPosts ? NoorStore.getPosts('knowledge') : []).filter((p) =>
@@ -6806,7 +6808,19 @@ function renderKnowledgeView(m) {
     ...posts.map((p) => ({ kind: 'post', type: postType(p), date: p.updated_at || p.created_at || '', post: p })),
     ...experiences.map((e) => ({ kind: 'exp', type: 'exp', date: e.created_at || '', experience: e }))
   ].sort((a, b) => String(b.date).localeCompare(String(a.date)));
-  const filtered = f === 'all' ? items : items.filter((it) => it.type === f);
+  const categoryItems = f === 'all' ? items : items.filter((it) => it.type === f);
+  const searchText = (it) => {
+    if (it.kind === 'proj') {
+      const p = it.project;
+      return [p.name, p.notes, p.author, p.summary, p.link].join(' ');
+    }
+    if (it.kind === 'post') {
+      const p = it.post;
+      return [p.title, p.text, p.author, p.link].join(' ');
+    }
+    return [it.experience.text, it.experience.category_name].join(' ');
+  };
+  const filtered = categoryItems.filter((it) => !query || searchText(it).toLocaleLowerCase().includes(query));
   const filters = [
     ['all', 'الكل'], ['كتاب', '📕 كتب'], ['فيديو', '🎬 فيديوهات'],
     ['كورس', '🎓 كورسات'], ['source', '🔗 المصادر'], ['exp', '🧭 التجارب']
@@ -6834,20 +6848,34 @@ function renderKnowledgeView(m) {
       ${filters.map(([k, label]) =>
         `<button type="button" class="jtab${f === k ? ' on' : ''}" data-k="${k}" onclick="jnFilterSpace('knowledge', '${k}')">${label}</button>`).join('')}
     </div>
+    <div class="knowledge-search-row">
+      <input class="input" id="knowledge-search-input" value="${esc(knowledgeSearchTerm)}" placeholder="ابحث في العناوين والملاحظات والمصادر…" aria-label="البحث في مستودع المعرفة" onkeydown="if(event.key==='Enter'){event.preventDefault();applyKnowledgeSearch()}">
+      <button type="button" class="btn btn-xs" onclick="applyKnowledgeSearch()">بحث</button>
+      ${query ? '<button type="button" class="btn btn-xs btn-ghost" onclick="clearKnowledgeSearch()">مسح البحث</button>' : ''}
+      <span class="count">${filtered.length} نتيجة</span>
+    </div>
     ${filtered.length ? `
       <div class="lib-grid knowledge-grid">
         ${filtered.map(renderItem).join('')}
       </div>`
       : `<div class="empty-box knowledge-empty">
-          <strong>${items.length ? 'لا توجد عناصر في هذا التصنيف' : 'ابدأ ببناء مستودع معرفتك'}</strong>
-          <p>أضف كتابًا أو فيديو أو رابطًا لمقال أو دورة، واكتب خلاصة ما تريد تذكّره. ستبقى العناصر قابلة للتعديل والرجوع إليها.</p>
+          <strong>${query ? 'لا توجد نتائج تطابق البحث' : (items.length ? 'لا توجد عناصر في هذا التصنيف' : 'ابدأ ببناء مستودع معرفتك')}</strong>
+          <p>${query ? 'جرّب عبارة أخرى أو امسح البحث لرؤية كل العناصر.' : 'أضف كتابًا أو فيديو أو رابطًا لمقال أو دورة، واكتب خلاصة ما تريد تذكّره. ستبقى العناصر قابلة للتعديل والرجوع إليها.'}</p>
           <div class="knowledge-actions">
-            <button type="button" class="btn btn-xs" onclick="openKnowledgeSource()">إضافة أول مصدر</button>
-            <button type="button" class="btn btn-xs btn-ghost" onclick="openKnowledgeNote()">كتابة ملاحظة</button>
+            ${query ? '<button type="button" class="btn btn-xs" onclick="clearKnowledgeSearch()">مسح البحث</button>' : '<button type="button" class="btn btn-xs" onclick="openKnowledgeSource()">إضافة أول مصدر</button><button type="button" class="btn btn-xs btn-ghost" onclick="openKnowledgeNote()">كتابة ملاحظة</button>'}
           </div>
         </div>`}`;
 }
 
+function applyKnowledgeSearch() {
+  const input = document.getElementById('knowledge-search-input');
+  knowledgeSearchTerm = input ? input.value.trim() : '';
+  if (state.page === 'journal') renderJournal().catch((e) => showToast('تعذّر تحديث نتائج البحث: ' + e.message, 'bad'));
+}
+function clearKnowledgeSearch() {
+  knowledgeSearchTerm = '';
+  if (state.page === 'journal') renderJournal().catch((e) => showToast('تعذّر تحديث مستودع المعرفة: ' + e.message, 'bad'));
+}
 function openKnowledgeProject(type) {
   openProjectModal(null);
   const select = document.getElementById('pj-type');
