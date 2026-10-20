@@ -3,7 +3,7 @@
   'use strict';
 
   var STORE_SRC = 'js/store.js?v=24';
-  var APP_SRC = 'js/app.js?v=100';
+  var APP_SRC = 'js/app.js?v=101';
   var SEED_URL = 'data/seed.json';
 
   document.body.classList.add('noor-unlocked');
