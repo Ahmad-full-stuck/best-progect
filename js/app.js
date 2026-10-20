@@ -346,17 +346,14 @@ async function renderTasks() {
   if (!(state.ignoreRestDate === todayISO()) && isRestDayToday() && !NoorStore.inFreeze(todayISO())) {
     const s = NoorStore.getSettings();
     const html = `
-      <div class="page-head">
-        <div>
-          <h2 class="page-title">🌴 يوم عطلة</h2>
-          <p class="page-sub">${fmtDateAr(d.date)}</p>
+      <div class="tasks-view tasks-rest-view">
+        <div class="page-head">
+          <div><span class="tasks-kicker">إيقاع مستدام</span><h2 class="page-title">يوم راحة</h2><p class="page-sub">${fmtDateAr(d.date)}</p></div>
         </div>
-      </div>
-      <div class="empty-box" style="text-align:center;padding:40px 20px">
-        <div style="font-size:42px;margin-bottom:8px">🌴</div>
-        <strong>اليوم يوم راحة مجدولة — كل ${+s.rest_day_every || 3} أيام تجدد طاقتك</strong>
-        <p>تتوقف فيه المهام اليومية والترحيل لتعود بنشاط كامل غدًا. لا شيء يُحتسب عليك اليوم.</p>
-        <button class="btn btn-ghost" onclick="ignoreRestDay()">أريد العمل اليوم على أي حال</button>
+        <section class="tasks-rest-panel">
+          <div class="tasks-rest-mark" aria-hidden="true">↗</div>
+          <div><span class="tasks-kicker">الراحة جزء من الخطة</span><h3>اليوم يوم راحة مجدولة</h3><p>كل ${+s.rest_day_every || 3} أيام تتوقف المهام والترحيل لتجدد طاقتك. لا شيء يُحتسب عليك اليوم.</p><button class="btn btn-ghost" onclick="ignoreRestDay()">أريد العمل اليوم على أي حال</button></div>
+        </section>
       </div>`;
     $('#content').innerHTML = html;
     return;
@@ -379,21 +376,25 @@ async function renderTasks() {
       </div>
     </div>` : '';
 
+  const taskDone = d.tasks.filter((t) => t.done).length;
+  const taskTotal = d.tasks.length;
+  const taskPct = taskTotal ? Math.round((taskDone / taskTotal) * 100) : 0;
+  const taskStatus = taskTotal ? `أنجزت ${taskDone} من ${taskTotal} مهمة` : 'ابدأ بتحديد أول خطوة عملية لليوم';
   const html = `
-    <div class="page-head">
-      <div>
-        <h2 class="page-title">مهام ${d.weekday}</h2>
-        <p class="page-sub">${fmtDateAr(d.date)} — ${d.tasks.length} في انتظارك · أسبوع ${NoorStore.weekInYear(d.date)} من السنة ${NoorStore.yearIndex(d.date)}</p>
+    <div class="tasks-view">
+      <div class="page-head tasks-page-head">
+        <div><span class="tasks-kicker">خطوة اليوم تصنع الاستمرار</span><h2 class="page-title">مهام ${d.weekday}</h2><p class="page-sub">${fmtDateAr(d.date)} · الأسبوع ${NoorStore.weekInYear(d.date)} من السنة ${NoorStore.yearIndex(d.date)}</p></div>
+        <div class="page-actions tasks-page-actions"><button class="btn btn-ghost" onclick="openHabitsModal()">عاداتي</button><button class="btn btn-lg" onclick="openTaskModal()">+ إضافة مهمة</button></div>
       </div>
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-        <button class="btn" onclick="openHabitsModal()">عاداتي</button>
-        <button class="btn btn-lg" onclick="openTaskModal()">+ إضافة مهمة</button>
-      </div>
-    </div>
-    ${foundationBanner}
-    ${limitBreakBanner()}
-    ${renderTodayBody(d)}
-    ${challengesZoneHTML()}`;
+      <section class="tasks-summary" aria-label="ملخص يومك">
+        <div class="tasks-summary-copy"><span class="tasks-summary-label">تقدم اليوم</span><strong>${taskStatus}</strong><p>${taskTotal ? (taskPct === 100 ? 'أتممت مهام اليوم. راجع ما تعلمته واستعد لليوم التالي.' : 'ركّز على المهمة التالية، وليس على القائمة كلها دفعة واحدة.') : 'أضف مهمة أو عادة واحدة لتبدأ، ويمكنك ترتيب بقية اليوم بعدها.'}</p></div>
+        <div class="tasks-summary-progress"><div class="tasks-summary-values"><strong>${taskPct}%</strong><span>${taskDone}/${taskTotal}</span></div><div class="tasks-progress-track"><span style="width:${taskPct}%"></span></div></div>
+      </section>
+      ${foundationBanner}
+      ${limitBreakBanner()}
+      <section class="tasks-list-section"><header class="tasks-list-heading"><div><h3>قائمة اليوم</h3><p>أنجز ما أمامك بالترتيب المناسب لك.</p></div><span class="tasks-list-count">${taskTotal} مهمة</span></header>${renderTodayBody(d)}</section>
+      ${challengesZoneHTML()}
+    </div>`;
   $('#content').innerHTML = html;
   bindDnD();
 }
@@ -913,24 +914,26 @@ async function deleteBarrierHost(id) {
 /* ===== التهيئة الأولى: قيم الحياة ===== */
 function renderOnboarding() {
   $('#content').innerHTML = `
-    <div class="onboard">
-      <div class="card onboard-card">
-        <div class="card-body">
-          <h2 class="onboard-title">قيم حياتك</h2>
-          <p class="onboard-sub">أدخل قيم حياتك كلها — القيمة هي المستوى الأعلى في نظامك (مثال: رياضي، غني، عالِم). داخل كل قيمة أهداف، وداخل الأهداف مهام فرعية (فروع/مراحل)، وداخل المهام الفرعية مشاريع. ستجدها لاحقًا في قسم الأهداف ← مساحة الوعي الذاتي.</p>
-          <div class="onboard-list" id="onboard-list"></div>
-          <div class="onboard-add">
-            <input class="input" id="onboard-input" placeholder="مثال: رياضي / غني / عالِم" autofocus>
-            <button class="btn" onclick="addOnboardGoal()">+ إضافة</button>
-          </div>
-          <div class="onboard-colors" id="onboard-colors">
-            ${COLORS.map((c, i) => `<label class="day-opt color-opt" title="${c}"><input type="radio" name="onboard-color" value="${c}" ${i === 0 ? 'checked' : ''}><span class="dot" style="background:${c}"></span></label>`).join('')}
-          </div>
-          <div class="modal-actions">
-            <button class="btn btn-lg" onclick="finishOnboarding()">✓ حفظ وبدء الرحلة</button>
-          </div>
+    <div class="first-run">
+      <section class="first-run-intro">
+        <span class="first-run-brand">نُور <i></i> نظام إدارة الحياة</span>
+        <div class="first-run-number">01 <span>— البداية</span></div>
+        <h2>ابدأ من الشخص الذي تريد أن تصبحه.</h2>
+        <p>قبل أن نبني قائمة مهام، حدّد ما يهمك في حياتك. ستكون هذه القيم أساس الأهداف، ومنها تتفرع المشاريع والخطوات اليومية.</p>
+        <div class="first-run-steps">
+          <div class="first-run-step active"><span>01</span><div><strong>قيمك</strong><small>ما الذي يوجّهك؟</small></div><b>الآن</b></div>
+          <div class="first-run-step"><span>02</span><div><strong>أهدافك</strong><small>ما الذي تريد تحقيقه؟</small></div></div>
+          <div class="first-run-step"><span>03</span><div><strong>مهامك اليومية</strong><small>ما الخطوة التالية؟</small></div></div>
         </div>
-      </div>
+        <div class="first-run-note"><span aria-hidden="true">i</span><p>لا يلزم أن ترتّب حياتك كلها اليوم. أضف القيم الأساسية فقط، ويمكنك تعديلها وإكمال خطتك لاحقًا.</p></div>
+      </section>
+      <section class="first-run-form">
+        <header class="first-run-form-head"><span class="first-run-overline">خطوتك الأولى</span><h3>ما القيم التي تريد أن تمثّلك؟</h3><p>أضف قيمة واحدة في كل مرة؛ مثل العلم، الصحة، الاستقلال، أو خدمة الآخرين.</p></header>
+        <div class="first-run-list-wrap"><div class="first-run-list-head"><strong>قيمك المضافة</strong><span class="count" id="onboard-count">${onboardGoals.length} قيمة</span></div><div class="onboard-list" id="onboard-list"></div></div>
+        <div class="first-run-entry"><label for="onboard-input">اسم القيمة</label><div class="onboard-add"><input class="input" id="onboard-input" placeholder="مثال: العلم أو الصحة" autofocus><button type="button" class="btn" onclick="addOnboardGoal()">إضافة</button></div></div>
+        <div class="first-run-color-field"><span>لون تمييز القيمة (اختياري)</span><div class="onboard-colors" id="onboard-colors">${COLORS.map((c, i) => `<label class="day-opt color-opt" title="${c}"><input type="radio" name="onboard-color" value="${c}" ${i === 0 ? 'checked' : ''}><span class="dot" style="background:${c}"></span></label>`).join('')}</div></div>
+        <footer class="first-run-footer"><p>ستتمكن من إضافة الأهداف والمشاريع بعد حفظ قيمك.</p><button type="button" class="btn btn-lg" onclick="finishOnboarding()">حفظ القيم وبدء الرحلة <span aria-hidden="true">←</span></button></footer>
+      </section>
     </div>`;
   renderOnboardList();
   const inp = $('#onboard-input');
@@ -941,9 +944,11 @@ let onboardGoals = [];
 function renderOnboardList() {
   const list = $('#onboard-list');
   if (!list) return;
+  const count = $('#onboard-count');
+  if (count) count.textContent = onboardGoals.length + (onboardGoals.length === 1 ? ' قيمة' : ' قيم');
   list.innerHTML = onboardGoals.length
-    ? onboardGoals.map((g, i) => `<div class="onboard-item"><span class="dot" style="background:${g.color}"></span><span class="onboard-item-title">${esc(g.title)}</span><button class="icon-btn danger" onclick="removeOnboardGoal(${i})">✕</button></div>`).join('')
-    : '<p class="count">لا قيم بعد — أضف أول قيمة.</p>';
+    ? onboardGoals.map((g, i) => `<div class="onboard-item"><span class="dot" style="background:${g.color}"></span><span class="onboard-item-title">${esc(g.title)}</span><button class="icon-btn danger" onclick="removeOnboardGoal(${i})" aria-label="حذف القيمة" title="حذف القيمة">×</button></div>`).join('')
+    : '<div class="first-run-empty"><strong>لم تضف قيمة بعد</strong><span>ابدأ بقيمة واحدة تعبّر عن الحياة التي تريد بناءها.</span></div>';
 }
 function addOnboardGoal() {
   const title = $('#onboard-input').value.trim();
@@ -4849,15 +4854,19 @@ async function updateSidebarStatus() {
 
 /* ===== النظرة: أصبحت مدمجة في أسفل الإحصائيات (Dashboard) كعنصر توسّعي ===== */
 async function renderVision() {
+  const year = NoorStore.yearIndex(NoorStore.todayStr());
   $('#content').innerHTML = `
-    <div class="page-head">
-      <div>
-        <h2 class="page-title">النظرة</h2>
-        <p class="page-sub">من أنت ولماذا تعمل — ثم أهدافك من الآن حتى نهاية خطتك</p>
+    <div class="vision-view">
+      <div class="page-head vision-page-head">
+        <div><span class="vision-page-kicker">نظام الحياة / التخطيط</span><h2 class="page-title">النظرة</h2><p class="page-sub">اربط هويتك وقيمك بوجهتك، ثم حوّل الصورة الكبيرة إلى أهداف يمكن العمل عليها.</p></div>
+        <div class="page-actions vision-page-actions">
+          <button type="button" class="btn btn-ghost" onclick="openValueModal(null)">+ قيمة حياتية</button>
+          <button type="button" class="btn btn-ghost" onclick="openNoteModal()">+ فكرة سريعة</button>
+          <button type="button" class="btn btn-lg" onclick="openGoalModalForYear(${year})">+ هدف جديد</button>
+        </div>
       </div>
-      <button class="btn btn-lg" onclick="openNoteModal()">+ فكرة عشوائية</button>
-    </div>
-    ${visionBodyHTML()}`;
+      ${visionBodyHTML()}
+    </div>`;
 }
 
 /* مصدر الأرقام الواحد للنظرة — تستهلكه اللوحة العلوية والخط الزمني والتقرير كلها من هنا */
@@ -4868,7 +4877,7 @@ function visionStats() {
   const curYear = NoorStore.yearIndex(today);
   const planYears = Math.max(1, Math.round(Number(s.plan_years) || 20));
   const maxYear = Math.max(planYears, curYear, goals.reduce(function (m, g) { return Math.max(m, ...((g.years && g.years.length) ? g.years : [g.year || 1])); }, 1));
-  const values = (s.values || '').split('\n').map(function (x) { return x.trim(); }).filter(Boolean);
+  const values = NoorStore.getValues().filter(function (v) { return !v.archived_at; });
   const yearsCovered = [];
   const yearsGap = [];
   for (let y = 1; y <= maxYear; y++) {
@@ -4890,29 +4899,40 @@ function visionStats() {
 
 /* اللوحة العلوية للنظرة: حلقة الإنجاز الكلي + أرقام الأساس — أول ما تقع عليه العين */
 function visionHeroHTML(st) {
-  const R = 42, C = (2 * Math.PI * R).toFixed(1);
-  const off = (C * (1 - Math.min(100, st.progPct) / 100)).toFixed(1);
-  return ''
-    + '<div class="vn-hero">'
-    + '<div class="card vn-hero-ring">'
-      + '<div class="ring-wrap"><svg class="ring" viewBox="0 0 96 96" width="96" height="96" aria-hidden="true">'
-      + '<circle cx="48" cy="48" r="' + R + '"></circle>'
-      + '<circle class="fg" cx="48" cy="48" r="' + R + '" style="stroke-dasharray:' + C + ';stroke-dashoffset:' + off + '"></circle></svg>'
-      + '<div class="ring-label">' + st.progPct + '%</div></div>'
-      + '<div class="vn-hero-info"><strong class="vn-hero-t">إنجاز الخطة كاملة</strong>'
-      + '<span class="count">' + st.active + ' هدف نشط · ' + st.completed + ' مكتمل</span>'
-      + (st.planDay ? '<span class="chip chip-warn">اليوم ' + st.planDay + ' من رحلتك</span>' : '')
-      + '</div></div>'
-    + '<div class="vn-hero-grid">'
-      + vnStat(st.values.length, '💎', 'قيم معرّفة')
-      + vnStat(st.goals.length, '🎯', 'إجمالي الأهداف')
-      + vnStat(st.maxYear, '📅', 'مدى الخطة (سنة)')
-      + vnStat(st.yearsCovered.length + ' / ' + st.maxYear, '🧭', 'تغطية السنوات')
-    + '</div></div>';
-  function vnStat(n, ic, l) { return '<div class="analysis-stat"><span class="as-num">' + n + '</span><span class="as-label">' + ic + ' ' + l + '</span></div>'; }
+  const r = 42;
+  const circumference = (2 * Math.PI * r).toFixed(1);
+  const offset = (circumference * (1 - Math.min(100, st.progPct) / 100)).toFixed(1);
+  const visionText = String(st.s.vision || '').trim();
+  return `
+    <section class="vision-hero" aria-label="ملخص الخطة">
+      <div class="vision-hero-main">
+        <div class="vision-hero-copy">
+          <span class="vision-eyebrow">بوصلة حياتك</span>
+          <h3>${visionText ? 'الصورة التي تعمل من أجلها' : 'ابنِ صورة واضحة لما تريد أن تصبحه'}</h3>
+          <p>${visionText ? esc(visionText.length > 190 ? visionText.slice(0, 190) + '…' : visionText) : 'اكتب منظورك الكبير، ثم حوّله إلى أهداف ومشاريع وخطوات قابلة للمتابعة.'}</p>
+          <div class="vision-hero-meta">
+            <span><strong>${st.active}</strong> هدف نشط</span>
+            <span><strong>${st.completed}</strong> هدف مكتمل</span>
+            ${st.planDay ? '<span>اليوم <strong>' + st.planDay + '</strong> من رحلتك</span>' : '<span>تبدأ الرحلة عند حفظ أول قيمك</span>'}
+          </div>
+        </div>
+        <div class="vision-hero-ring-wrap">
+          <svg class="vision-hero-ring" viewBox="0 0 100 100" role="img" aria-label="إنجاز الخطة ${st.progPct}%">
+            <circle class="vision-ring-track" cx="50" cy="50" r="${r}"></circle>
+            <circle class="vision-ring-value" cx="50" cy="50" r="${r}" style="stroke-dasharray:${circumference};stroke-dashoffset:${offset}"></circle>
+          </svg>
+          <div class="vision-hero-ring-label"><strong>${st.progPct}%</strong><span>الإنجاز</span></div>
+        </div>
+      </div>
+      <div class="vision-stat-grid">
+        <article class="vision-stat"><span class="vision-stat-label">قيم حياتية</span><strong class="vision-stat-number">${st.values.length}</strong><span class="vision-stat-foot">ما يوجّه قراراتك</span></article>
+        <article class="vision-stat"><span class="vision-stat-label">إجمالي الأهداف</span><strong class="vision-stat-number">${st.goals.length}</strong><span class="vision-stat-foot">ما تريد تحقيقه</span></article>
+        <article class="vision-stat"><span class="vision-stat-label">سنوات مخططة</span><strong class="vision-stat-number">${st.yearsCovered.length}<small> / ${st.maxYear}</small></strong><span class="vision-stat-foot">سنوات لها أهداف</span></article>
+        <article class="vision-stat"><span class="vision-stat-label">مدى الخطة</span><strong class="vision-stat-number">${st.maxYear}<small> سنة</small></strong><span class="vision-stat-foot">أفق التخطيط الحالي</span></article>
+      </div>
+    </section>`;
 }
 
-/* الخط الزمني المرئي لسنوات الخطة — مربع لكل سنة */
 function visionTimelineHTML(st) {
   let yline = '';
   for (let y = 1; y <= st.maxYear; y++) {
@@ -4937,11 +4957,13 @@ function visionBodyHTML() {
   const goals = NoorStore.getGoals();
   const notes = NoorStore.getNotes();
   const st = visionStats();
+  const lifeValues = NoorStore.getValues().filter((v) => !v.archived_at)
+    .sort((a, b) => (a.priority || 999) - (b.priority || 999) || a.id - b.id);
   const planYears = Math.max(1, Math.round(Number(s.plan_years) || 20));
   const maxGoalYear = goals.reduce((m, g) => Math.max(m, ...(g.years && g.years.length ? g.years : [g.year || 1])), 1);
   const maxYear = Math.max(planYears, curYear, maxGoalYear);
 
-  let hier = '';
+  let hierarchy = '';
   const scheduleCache = {};
   const scheduleOf = (gid) => (scheduleCache[gid] = scheduleCache[gid] || NoorStore.branchSchedule(gid));
   for (let y = 1; y <= maxYear; y++) {
@@ -4952,79 +4974,92 @@ function visionBodyHTML() {
     const carried = [];
     goals.forEach((g) => {
       if ((g.years && g.years.length ? g.years : [g.year]).indexOf(y) >= 0) return;
-      scheduleOf(g.id).forEach((s) => { if (s.startYear <= y && s.endYear >= y) carried.push({ g: g, s: s }); });
+      scheduleOf(g.id).forEach((item) => { if (item.startYear <= y && item.endYear >= y) carried.push({ g, s: item }); });
     });
-    const RING_C = (2 * Math.PI * 18).toFixed(1);
-    const ringOff = (RING_C * (1 - Math.min(100, ys.pct) / 100)).toFixed(1);
+    const ringC = (2 * Math.PI * 18).toFixed(1);
+    const ringOff = (ringC * (1 - Math.min(100, ys.pct || 0) / 100)).toFixed(1);
     const stateCls = y === curYear ? 'cur open' : ('collapsed ' + (y < curYear ? 'past' : 'future'));
-    const yearChip = y === curYear ? '<span class="chip chip-warn">أنت هنا</span>' : (y < curYear && ys.pct >= 100 ? '<span class="chip chip-done">✅ اكتملت</span>' : '');
-    hier += `
-      <div id="vision-year-${y}" class="yh ${stateCls}">
-        <div class="yh-head" role="button" tabindex="0" aria-expanded="${y === curYear ? 'true' : 'false'}" onkeydown="if(event.target===this&&(event.key==='Enter'||event.key===' ')){event.preventDefault();toggleYh(this)}" onclick="toggleYh(this)" title="${y === curYear ? 'طي السنة' : 'فتح السنة'}">
+    const yearStatus = y === curYear ? '<span class="chip chip-warn">السنة الحالية</span>' : (y < curYear && ys.pct >= 100 ? '<span class="chip chip-done">اكتملت</span>' : '');
+    hierarchy += `
+      <section id="vision-year-${y}" class="yh ${stateCls}" aria-label="السنة ${y}">
+        <div class="yh-head" role="button" tabindex="0" aria-expanded="${y === curYear ? 'true' : 'false'}"
+          onkeydown="if(event.target===this&&(event.key==='Enter'||event.key===' ')){event.preventDefault();toggleYh(this)}"
+          onclick="toggleYh(this)" title="${y === curYear ? 'طي السنة' : 'فتح السنة'}">
           <div class="yh-ring">
             <svg class="ring" viewBox="0 0 48 48" width="48" height="48" aria-hidden="true">
               <circle class="bg" cx="24" cy="24" r="18"></circle>
-              <circle class="fg" cx="24" cy="24" r="18" style="stroke-dasharray:${RING_C};stroke-dashoffset:${ringOff}"></circle>
+              <circle class="fg" cx="24" cy="24" r="18" style="stroke-dasharray:${ringC};stroke-dashoffset:${ringOff}"></circle>
             </svg>
-            <div class="ring-label">${ys.pct}%</div>
+            <div class="ring-label">${ys.pct || 0}%</div>
           </div>
-          <div class="yh-info">
-            <strong class="yh-title">السنة ${y} ${yearChip}</strong>
-            <span class="count">${ys.done} من ${ys.expected} وحدة · ${yearGoals.length} هدف</span>
-            <div class="yh-mini"><span class="an-bar"><span class="an-fill" style="width:${ys.pct}%;${ys.pct >= 100 ? 'background:var(--green)' : ''}"></span></span></div>
-          </div>
+          <div class="yh-info"><strong class="yh-title">السنة ${y} ${yearStatus}</strong><span class="count">${ys.done} من ${ys.expected} وحدة · ${yearGoals.length} هدف</span><div class="yh-mini"><span class="an-bar"><span class="an-fill" style="width:${Math.max(0, Math.min(100, ys.pct || 0))}%;${ys.pct >= 100 ? 'background:var(--green)' : ''}"></span></span></div></div>
           <span class="yh-chev" aria-hidden="true"></span>
           <button class="btn btn-xs" onclick="event.stopPropagation();openGoalModalForYear(${y})">+ هدف</button>
         </div>
-        ${yearGoals.length ? `<div class="yh-body">${yearGoals.map((g) => {
-          const state = activeIds[g.id] ? 'active' : (NoorStore.goalIsCompleted(g) ? 'done' : 'waiting');
-          const branches = state === 'active' ? scheduleOf(g.id).filter((s) => s.startYear <= y && s.endYear >= y) : [];
-          return goalNode(g, ys, branches, state);
-        }).join('')}</div>` : '<div class="yh-empty">لا أهداف لهذه السنة بعد — أضف أول هدف.</div>'}
-        ${carried.length ? `<div class="yh-branches"><span class="chip chip-proj">فروع ممتدة لهذه السنة:</span>${carried.map(({ g, s }) => `<span class="chip" title="${esc(g.title)}">🧭 ${esc(s.title)} — ${s.weeks} أسبوع</span>`).join('')}</div>` : ''}
-      </div>`;
+        ${yearGoals.length
+          ? '<div class="yh-body">' + yearGoals.map((g) => {
+              const state = activeIds[g.id] ? 'active' : (NoorStore.goalIsCompleted(g) ? 'done' : 'waiting');
+              const branches = state === 'active' ? scheduleOf(g.id).filter((item) => item.startYear <= y && item.endYear >= y) : [];
+              return goalNode(g, ys, branches, state);
+            }).join('') + '</div>'
+          : '<div class="yh-empty">لا أهداف لهذه السنة بعد. أضف هدفًا واضحًا، ثم حوّله إلى مشاريع ومهام.</div>'}
+        ${carried.length ? '<div class="yh-branches"><span class="chip chip-proj">فروع ممتدة لهذه السنة:</span>' + carried.map(({ g, s }) => '<span class="chip" title="' + esc(g.title) + '">↳ ' + esc(s.title) + ' — ' + s.weeks + ' أسبوع</span>').join('') + '</div>' : ''}
+      </section>`;
   }
 
+  const valueRows = lifeValues.length ? lifeValues.map((v) => `
+    <article class="vision-value-row">
+      <span class="vision-value-icon" style="--value-color:${esc(v.color) || 'var(--accent)'}">${esc(v.icon || '◆')}</span>
+      <span class="vision-value-name">${esc(v.title)}</span>
+      <div class="vision-value-actions">
+        <button type="button" class="icon-btn" onclick="openValueModal(${v.id})" aria-label="تعديل القيمة" title="تعديل القيمة">✎</button>
+        <button type="button" class="icon-btn danger" onclick="archiveValueItem(${v.id})" aria-label="أرشفة القيمة" title="أرشفة القيمة">×</button>
+      </div>
+    </article>`).join('') : `
+      <div class="vision-empty-inline"><p>لم تضف قيمك الحياتية بعد. ابدأ بما تريد أن يحكم قراراتك واختياراتك.</p><button type="button" class="btn btn-ghost btn-sm" onclick="openValueModal(null)">+ إضافة أول قيمة</button></div>`;
+
+  const ideaRows = notes.length ? notes.map((n) => `
+    <article class="vision-idea-card">
+      <div class="vision-idea-text">${esc(n.text)}</div>
+      <div class="vision-idea-actions"><span class="count">${n.created_at ? esc(fmtDateAr(String(n.created_at).slice(0, 10))) : (n.date ? esc(n.date) : 'فكرة محفوظة')}</span><button type="button" class="icon-btn danger" onclick="archiveNoteItem(${n.id})" title="أرشفة الفكرة" aria-label="أرشفة الفكرة">×</button></div>
+    </article>`).join('') : `
+    <div class="vision-empty-inline"><p>ضع هنا الرغبات والأسئلة والأفكار التي لم تتحول إلى أهداف بعد. لا حاجة لترتيبها فورًا.</p></div>`;
+
   return `
-    ${visionHeroHTML(st)}
-    <div class="vision-grid">
-      <div class="card">
-        <div class="card-head"><h3 class="card-title">🧍 من أنا</h3><button class="btn btn-xs" onclick="saveVisionField('who_am_i','v-who')">حفظ</button></div>
-        <div class="card-body"><textarea class="input" id="v-who" rows="3" placeholder="من أنت؟ ماذا تحب؟ ماذا تريد أن تكون؟">${esc(s.who_am_i)}</textarea></div>
-      </div>
-      <div class="card">
-        <div class="card-head"><h3 class="card-title">🔭 المنظور</h3><button class="btn btn-xs" onclick="saveVisionField('vision','v-vision')">حفظ</button></div>
-        <div class="card-body"><textarea class="input" id="v-vision" rows="3" placeholder="صورتك الكبرى: أين تريد أن تصل بعد سنوات؟">${esc(s.vision)}</textarea></div>
-      </div>
-      <div class="card">
-        <div class="card-head"><h3 class="card-title">💎 القيم</h3><button class="btn btn-xs" onclick="saveVisionField('values','v-values')">حفظ</button></div>
-        <div class="card-body">
-          <textarea class="input" id="v-values" rows="3" placeholder="قيمك التي تحكم قراراتك — قيمة في كل سطر">${esc(s.values)}</textarea>
-          ${st.values.length ? '<div class="val-chips">' + st.values.map((v) => '<span class="chip">' + esc(v) + '</span>').join('') + '</div>' : ''}
+    <div class="vision-workspace">
+      ${visionHeroHTML(st)}
+      <section class="vision-section" aria-labelledby="vision-compass-title">
+        <header class="vision-section-heading"><div><span class="vision-section-index">01 / الأساس</span><h3 id="vision-compass-title">بوصلة الحياة</h3><p>وضوح هويتك ووجهتك وقيمك يجعل بقية الخطة مترابطة.</p></div></header>
+        <div class="vision-compass-grid">
+          <article class="vision-panel">
+            <header class="vision-panel-head"><div><span class="vision-panel-number">01</span><h4>من أنا؟</h4><p>هويتك اليوم وما تريد تطويره في نفسك.</p></div><button type="button" class="btn btn-xs btn-ghost" onclick="saveVisionField('who_am_i','v-who')">حفظ</button></header>
+            <textarea class="input vision-textarea" id="v-who" rows="4" placeholder="من أنت؟ ما نقاط قوتك؟ وما الذي تريد تغييره؟">${esc(s.who_am_i)}</textarea>
+          </article>
+          <article class="vision-panel vision-panel-emphasis">
+            <header class="vision-panel-head"><div><span class="vision-panel-number">02</span><h4>إلى أين أتجه؟</h4><p>الصورة التي تريد أن تصل إليها على المدى البعيد.</p></div><button type="button" class="btn btn-xs btn-ghost" onclick="saveVisionField('vision','v-vision')">حفظ</button></header>
+            <textarea class="input vision-textarea" id="v-vision" rows="4" placeholder="صف الحياة التي تسعى إلى بنائها، بكلماتك أنت.">${esc(s.vision)}</textarea>
+          </article>
+          <article class="vision-panel vision-values-panel">
+            <header class="vision-panel-head"><div><span class="vision-panel-number">03</span><h4>ما الذي لا أتنازل عنه؟</h4><p>القيم الحياتية هي مبادئ توجه اختياراتك.</p></div><button type="button" class="btn btn-xs" onclick="openValueModal(null)">+ قيمة</button></header>
+            <div class="vision-values-list">${valueRows}</div>
+            <div class="vision-values-note"><label for="v-values">مبادئ أو تذكيرات شخصية (اختياري)</label><textarea class="input" id="v-values" rows="2" placeholder="قواعد تريد تذكّرها عند اتخاذ القرارات…">${esc(s.values)}</textarea><button type="button" class="btn btn-xs btn-ghost" onclick="saveVisionField('values','v-values')">حفظ التذكيرات</button></div>
+          </article>
         </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-head"><h3 class="card-title">عشوائيات — أفكار الأهداف</h3><span class="count">${notes.length} فكرة</span></div>
-      <div class="card-body">
-        <div class="st-add">
-          <input class="input" id="idea-input" placeholder="اكتب فكرتك هنا ثم اضغط Enter…" onkeydown="if(event.key==='Enter'){event.preventDefault();addIdeaNow()}">
-          <button class="btn" onclick="addIdeaNow()">إضافة فكرة</button>
-        </div>
-        ${notes.length ? notes.map((n) => `
-          <div class="note-item">
-            <span class="note-text">${esc(n.text)}</span>
-            <button class="icon-btn danger" onclick="archiveNoteItem(${n.id})" title="حذف">✕</button>
-          </div>`).join('') : '<div class="empty-box"><strong>لا أفكار بعد</strong><p>اكتب فكرتك في الحقل أعلاه واضغط Enter — اجمع هنا أي فكرة أو رغبة عابرة تخص أهدافك.</p></div>'}
-      </div>
-    </div>
-
-    <div class="card vn-timeline">${visionTimelineHTML(st)}</div>
-
-    <h3 class="card-title mt vision-hier-title">سنوات الخطة — السنة ← الأهداف ← المشاريع ← المهام</h3>
-    <div class="card vn-years"><div class="vision-hier">${hier}</div></div>
-`;
+      </section>
+      <section class="vision-section vision-ideas-section" aria-labelledby="vision-ideas-title">
+        <header class="vision-section-heading"><div><span class="vision-section-index">02 / مساحة حرة</span><h3 id="vision-ideas-title">الأفكار قبل أن تصبح أهدافًا</h3><p>التقط الفكرة أولًا، ثم ارجع إليها عندما يحين وقت تحويلها إلى خطة.</p></div><span class="vision-section-count">${notes.length} فكرة</span></header>
+        <div class="vision-idea-compose"><label for="idea-input">فكرة عابرة أو هدف محتمل</label><div class="vision-idea-entry"><input class="input" id="idea-input" placeholder="اكتب الفكرة بجملة واحدة…" onkeydown="if(event.key==='Enter'){event.preventDefault();addIdeaNow()}"><button type="button" class="btn" onclick="addIdeaNow()">حفظ الفكرة</button></div></div>
+        <div class="vision-ideas-grid">${ideaRows}</div>
+      </section>
+      <section class="vision-section vision-roadmap-section" aria-labelledby="vision-roadmap-title">
+        <header class="vision-section-heading"><div><span class="vision-section-index">03 / المدى البعيد</span><h3 id="vision-roadmap-title">خريطة السنوات</h3><p>كل بطاقة سنة هي مدخل سريع إلى أهدافها، ونسبة الإنجاز، وما يحتاج إلى تخطيط.</p></div><button type="button" class="btn btn-sm btn-ghost" onclick="openGoalModalForYear(${curYear})">+ هدف للسنة الحالية</button></header>
+        <div class="vision-roadmap-panel"><div class="vision-roadmap-legend"><span><i class="vision-legend-mark has-goals"></i> لديها أهداف</span><span><i class="vision-legend-mark no-goals"></i> تحتاج إلى تخطيط</span><span><i class="vision-legend-mark current-year"></i> السنة الحالية</span></div>${visionTimelineHTML(st)}</div>
+      </section>
+      <section class="vision-section vision-hierarchy-section" aria-labelledby="vision-hierarchy-title">
+        <header class="vision-section-heading"><div><span class="vision-section-index">04 / التنفيذ</span><h3 id="vision-hierarchy-title">من السنة إلى الخطوة التالية</h3><p>تسلسل أهدافك ومشاريعك ومهامك في مكان واحد. افتح السنة التي تريد مراجعتها.</p></div><span class="vision-section-count">${goals.length} هدفًا في الخطة</span></header>
+        <div class="vision-years-tree"><div class="vn-years"><div class="vision-hier">${hierarchy}</div></div></div>
+      </section>
+    </div>`;
 }
 
 function toggleYh(btn) {
@@ -6166,6 +6201,7 @@ async function factoryReset() {
   /* 4) تنفيذ الحذف الكامل */
   try {
     NoorStore.factoryReset();
+    onboardGoals = [];
     showToast('✅ تمت إعادة ضبط المصنع — النظام فارغ الآن');
     play('success');
   } catch (e) {
