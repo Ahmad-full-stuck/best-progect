@@ -7265,16 +7265,22 @@ function openDailyExpOnly(st) {
 function jnProjectCard(m, p) {
   const t = projectType(p.type);
   const tcls = p.type === 'كتاب' ? ' t-book' : p.type === 'فيديو' ? ' t-video' : p.type === 'كورس' ? ' t-course' : '';
+  const cover = p.cover
+    ? `<img src="${cachedCover(p.cover)}" alt="" loading="lazy" onerror="this.closest('.lib-cover').innerHTML='<span class=&quot;lib-type&quot;>${t.icon}</span>'">`
+    : `<span class="lib-type">${t.icon}</span>`;
+  const safeLink = noorSafeUrl(p.link);
   return `
     <div class="lib-card${tcls}" onclick="openProjectTasksModal(${p.id})" title="عرض المشروع">
-      <div class="lib-cover lib-cover-empty"><span class="lib-type">${t.icon}</span></div>
+      <div class="lib-cover ${p.cover ? '' : 'lib-cover-empty'}">${cover}</div>
       <div class="lib-body">
         <div class="lib-title">${esc(p.name)}</div>
+        ${p.author ? `<div class="lib-author">${esc(p.author)}</div>` : ''}
         ${p.rating > 0 ? `<div class="lib-rating">${starsHTML(p.rating)}</div>` : ''}
-        ${p.summary ? `<div class="lib-summary">${esc(p.summary.length > 90 ? p.summary.slice(0, 90) + '…' : p.summary)}</div>` : ''}
+        ${p.summary ? `<div class="lib-summary">${esc(p.summary.length > 110 ? p.summary.slice(0, 110) + '…' : p.summary)}</div>` : ''}
         <div class="lib-foot">
           <span class="chip jchip">${t.icon} ${esc(t.title)}</span>
           ${p.completed_at ? `<span class="chip chip-ok">مكتمل ✓</span>` : ''}
+          ${safeLink ? `<a class="chip chip-blue" href="${esc(safeLink)}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">فتح المصدر ↗</a>` : ''}
         </div>
       </div>
     </div>`;
