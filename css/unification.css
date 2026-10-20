@@ -178,3 +178,51 @@ button, input, select, textarea { font-family: var(--font); }
   border-color: var(--accent);
   color: var(--white);
 }
+
+
+/* حقول الملفات الموجودة داخل النوافذ المنبثقة كانت خارج نطاق #content؛ طبّق القياس نفسه عليها. */
+#modalOverlay .cover-picker-row,
+#modalOverlay .field-row:has(#pj-cover-file),
+#modalOverlay .field-row:has(#pd-cover-file),
+#modalOverlay .field-row:has(#post-cover-file),
+#modalOverlay .field-row:has(#pj-file-input),
+#modalOverlay .field-row:has(#pd-book-file) {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+#modalOverlay .cover-picker-row > .cover-picker-button,
+#modalOverlay .field-row:has(#pj-cover-file) > button.btn,
+#modalOverlay .field-row:has(#pd-cover-file) > button.btn,
+#modalOverlay .field-row:has(#post-cover-file) > button.btn,
+#modalOverlay .field-row:has(#pj-file-input) > button.btn,
+#modalOverlay .field-row:has(#pd-book-file) > button.btn {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 1 auto;
+  max-width: 100%;
+  height: 36px;
+  min-height: 36px;
+  padding: 6px 10px;
+  line-height: 1.2;
+}
+#modalOverlay .cover-picker-row > .cover-url-input,
+#modalOverlay .field-row:has(#pj-cover-file) > input.input,
+#modalOverlay .field-row:has(#pd-cover-file) > input.input,
+#modalOverlay .field-row:has(#post-cover-file) > input.input,
+#modalOverlay .field-row:has(#pj-file-input) > input.input,
+#modalOverlay .field-row:has(#pd-book-file) > input.input {
+  box-sizing: border-box;
+  flex: 1 1 180px;
+  width: auto;
+  min-width: 0;
+  height: 36px;
+  min-height: 36px;
+  padding: 6px 10px;
+  line-height: 1.2;
+}
