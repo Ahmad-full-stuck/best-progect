@@ -2316,7 +2316,7 @@ async function renderLibrary() {
   $('#content').innerHTML = html;
 }
 
-const LIB_COVER_TONES = [NOOR_ACCENT, '#2D5B7A', '#4A7C59', '#7A5C9C', '#B8860B', '#A8456B'];
+const LIB_COVER_TONES = [NOOR_ACCENT];
 
 function libCoverHTML(p, big) {
   if (p.cover) return `<img class="${big ? 'lib-cover-big' : 'lib-cover'}" src="${cachedCover(p.cover)}" alt="" loading="lazy">`;
