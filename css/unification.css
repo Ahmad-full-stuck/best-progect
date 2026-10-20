@@ -227,9 +227,9 @@ textarea {
 #modalOverlay textarea {
   box-sizing: border-box;
   max-width: 100%;
-  border: 1px solid var(--border-light);
+  border: var(--border-w-strong) solid var(--text);
   border-radius: 0;
-  background-color: var(--white);
+  background-color: var(--bg);
   color: var(--ink);
   font-family: var(--font);
   font-size: var(--fs-base);
@@ -260,7 +260,7 @@ textarea {
   outline: none;
   border-color: var(--accent);
   background-color: var(--white);
-  box-shadow: 0 0 0 2px var(--accent-a15);
+  box-shadow: none;
 }
 #content input::placeholder,
 #content textarea::placeholder,
@@ -281,7 +281,7 @@ textarea {
   display: block;
   margin-bottom: var(--space-2);
   color: var(--ink-2);
-  font-family: var(--font);
+  font-family: var(--font-title);
   font-size: var(--fs-sm);
   font-weight: 700;
   line-height: 1.5;
@@ -459,9 +459,6 @@ textarea {
   #content .page-title { font-size: var(--fs-xl); }
   #content .card-head,
   #content .dash-card-head { gap: var(--space-2); }
-  #content .card-body { padding: var(--space-3); }
-  #content .card-head { padding: var(--space-3); }
-  #content .card-foot { padding: var(--space-2) var(--space-3); }
   #content .btn,
   #modalOverlay .btn { max-width: 100%; }
   #content .page-actions { align-items: stretch; }
@@ -477,4 +474,45 @@ textarea {
   #content .jtab,
   #content .jmode,
   #modalOverlay .btn { transition: none !important; }
+}
+
+
+/* Preserve the initial life-values screen as the visual reference for form fields. */
+#content .onboard-card {
+  border: var(--border-w) solid var(--border);
+  background: var(--white);
+  box-shadow: var(--shadow-sm);
+}
+#content .onboard-card .input {
+  border: var(--border-w-strong) solid var(--text);
+  background: var(--bg);
+}
+#content .onboard-card .input:focus {
+  border-color: var(--accent);
+  background: var(--white);
+  box-shadow: none;
+}
+#content .onboard-colors .color-opt:has(input:checked) {
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--white);
+}
+/* The focus timer is an approved reference screen; keep its established shell. */
+#content .timer-wrap .card {
+  border-color: var(--border);
+  box-shadow: var(--shadow-sm);
+  background: var(--white);
+}
+#content .timer-wrap .card-head {
+  border-color: var(--border);
+  background: var(--white);
+}
+/* Paired cover picker controls remain the same height even when their labels differ. */
+#content .cover-picker-row > .btn,
+#content .field-row:has(#pj-cover-file) > button.btn,
+#content .field-row:has(#pd-cover-file) > button.btn,
+#content .field-row:has(#post-cover-file) > button.btn {
+  height: 44px;
+  min-height: 44px;
+  line-height: 1.25;
 }
