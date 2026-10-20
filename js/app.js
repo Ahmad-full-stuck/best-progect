@@ -1752,6 +1752,18 @@ function pjTypeFieldsHTML(type, p) {
       </div>
       <p class="count" style="display:block">عادة متكررة: لا تظهر في «المشاريع» بل تظهر تلقائيًا في مهامك اليومية في الأيام المسموحة فقط — ويمكن ربطها بهدف ليظهر تحته في الهرم.</p>`;
   }
+  if (type === 'كتاب' || type === 'فيديو' || type === 'كورس') {
+    const isVideo = type === 'فيديو';
+    const authorLabel = type === 'كتاب' ? 'المؤلف' : type === 'فيديو' ? 'القناة / المتحدث' : 'الجهة أو المدرّس';
+    const summaryLabel = type === 'كتاب' ? 'ملخص الكتاب وملاحظاتك' : type === 'فيديو' ? 'ملخص الفيديو وأهم الأفكار' : 'وصف الكورس وما تريد تعلمه';
+    return `
+      <div class="field-row">
+        <div class="field"><label>${authorLabel} (اختياري)</label><input class="input" id="pj-author" value="${p ? esc(p.author || '') : ''}" placeholder="${isVideo ? 'اسم القناة أو المتحدث' : authorLabel}"></div>
+        <div class="field"><label>تقييمك (من 5)</label>${starInputHTML(p ? p.rating : 0)}</div>
+      </div>
+      <div class="field"><label>${summaryLabel}</label><textarea class="input" id="pj-summary" rows="3" placeholder="اكتب خلاصة قابلة للرجوع إليها لاحقًا…">${p ? esc(p.summary || '') : ''}</textarea></div>
+      <p class="count">يمكنك حفظ رابط المادة وملفها وصورة غلافها ضمن بيانات هذا العنصر.</p>`;
+  }
   if (type === 'دراسة') return `<p class="count" style="display:block">مشروع دراسة: أضف المواد الدراسية من زر «📚 المواد» في بطاقة المشروع — كل مادة لها مهامها وفيديوهاتها وملفاتها ومدتها — وتُعرض في المؤقت عند اختيار المشروع.</p>`;
   return '';
 }
