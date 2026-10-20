@@ -143,6 +143,15 @@ function setStarPick(el) {
   play('tick');
 }
 
+function noorSafeUrl(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  try {
+    const url = new URL(raw);
+    return url.protocol === 'https:' || url.protocol === 'http:' ? url.href : '';
+  } catch (_) { return ''; }
+}
+
 function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
@@ -5460,8 +5469,8 @@ const POST_SPACES = [
     types: [ { key: 'feel', icon: '💭', title: 'مشاعر' }, { key: 'goal', icon: '🎯', title: 'أهداف' }, { key: 'decide', icon: '⚖️', title: 'قرارات' }, { key: 'diary', icon: '📔', title: 'يوميات' } ] },
   { key: 'projects',    icon: '📚', color: NOOR_ACCENT, title: 'مساحة المشاريع',        desc: 'خطوات أي عمل يطول تنفيذه (كورس، رحلة، وظيفة) مع تتبع الإنجاز', placeholder: 'مثال: كورس لغة، رحلة علمية، وظيفة جديدة…',
     types: [ { key: 'course', icon: '🎓', title: 'كورس' }, { key: 'trip', icon: '✈️', title: 'رحلة' }, { key: 'job', icon: '🏢', title: 'وظيفة جديدة' } ] },
-  { key: 'knowledge',   icon: '📖', color: '#8A5A9E', title: 'مساحة تجميع المعرفة',   desc: 'خلاصة ما تتعلمه من الكتب والفيديوهات والتجارب للرجوع إليه سريعًا', placeholder: 'خلاصة كتاب، درس من فيديو، تجربة حياتية…',
-    types: [ { key: 'book', icon: '📕', title: 'كتب' }, { key: 'video', icon: '🎬', title: 'فيديوهات' }, { key: 'exp', icon: '🧭', title: 'تجارب حياتية' } ] }
+  { key: 'knowledge',   icon: '📖', color: '#8A5A9E', title: 'مساحة تجميع المعرفة',   desc: 'خلاصة ما تتعلمه من الكتب والفيديوهات والمصادر والتجارب للرجوع إليه سريعًا', placeholder: 'خلاصة كتاب، رابط مصدر، درس من فيديو، تجربة حياتية…',
+    types: [ { key: 'book', icon: '📕', title: 'كتب' }, { key: 'video', icon: '🎬', title: 'فيديوهات' }, { key: 'source', icon: '🔗', title: 'مصادر وروابط' }, { key: 'exp', icon: '🧭', title: 'ملاحظات معرفية' } ] }
 ];
 
 function loadSpaceTypes() {
@@ -5470,9 +5479,12 @@ function loadSpaceTypes() {
 
 function getSpaceTypes(space) {
   const saved = loadSpaceTypes()[space];
-  if (saved && Array.isArray(saved) && saved.length) return saved;
   const m = POST_SPACES.find((x) => x.key === space);
-  return m ? m.types : [];
+  const types = saved && Array.isArray(saved) && saved.length ? saved.slice() : (m ? m.types.slice() : []);
+  if (space === 'knowledge' && !types.some((t) => t.key === 'source')) {
+    types.push({ key: 'source', icon: '🔗', title: 'مصدر / رابط' });
+  }
+  return types;
 }
 
 function jTypeIcon(space, sub) {
@@ -6739,27 +6751,113 @@ function journalSections(key) {
   return secs;
 }
 
-/* ===== مساحة تجميع المعرفة: مشاريع مكتملة (كتاب/فيديو/كورس) + تجارب في مكتبة واحدة ===== */
+/* ===== مساحة تجميع المعرفة: مشاريع ومواد ومصادر وروابط محفوظة ===== */
 function renderKnowledgeView(m) {
-  const s = state.journalSrv;
-  const doneProj = s.projects.filter((p) => p.status === 'done' && (p.type === 'كتاب' || p.type === 'فيديو' || p.type === 'كورس'));
-  const exp = s.experiences;
   const f = spaceFilters.knowledge || 'all';
+  const projects = NoorStore.getProjects().filter((p) => ['كتاب', 'فيديو', 'كورس'].includes(p.type));
+  const experiences = state.journalSrv.experiences || [];
+  const posts = (NoorStore.getPosts ? NoorStore.getPosts('knowledge') : []).filter((p) =>
+    !(Array.isArray(p.tags) && p.tags.includes('idea')) && !p.archived_at
+  );
+  const postType = (p) => ({ book: 'كتاب', video: 'فيديو', source: 'source', exp: 'exp' }[p.sub] || 'exp');
   const items = [
-    ...doneProj.map((p) => ({ kind: 'proj', type: p.type, proj: p })),
-    ...exp.map((e) => ({ kind: 'exp', type: 'exp', exp: e }))
+    ...projects.map((p) => ({ kind: 'proj', type: p.type, date: p.updated_at || p.created_at || '', project: p })),
+    ...posts.map((p) => ({ kind: 'post', type: postType(p), date: p.updated_at || p.created_at || '', post: p })),
+    ...experiences.map((e) => ({ kind: 'exp', type: 'exp', date: e.created_at || '', experience: e }))
+  ].sort((a, b) => String(b.date).localeCompare(String(a.date)));
+  const filtered = f === 'all' ? items : items.filter((it) => it.type === f);
+  const filters = [
+    ['all', 'الكل'], ['كتاب', '📕 كتب'], ['فيديو', '🎬 فيديوهات'],
+    ['كورس', '🎓 كورسات'], ['source', '🔗 المصادر'], ['exp', '🧭 التجارب']
   ];
-  const filtered = f === 'all' ? items : items.filter((it) => it.type === f || (f === 'exp' && it.kind === 'exp'));
+  const renderItem = (it) => {
+    if (it.kind === 'proj') return jnProjectCard(m, it.project);
+    if (it.kind === 'exp') return jnExpCard(it.experience);
+    return jnKnowledgePostCard(it.post);
+  };
   return `
-    <div class="jfilter" id="jf-knowledge">
-      ${[['all', 'الكل'], ['كتاب', '📕 كتب'], ['فيديو', '🎬 فيديوهات'], ['كورس', '🎓 كورسات'], ['exp', '🧭 تجارب']].map(([k, l]) =>
-        `<button type="button" class="jtab${f === k ? ' on' : ''}" data-k="${k}" onclick="jnFilterSpace('knowledge', '${k}')">${l}</button>`).join('')}
+    <div class="knowledge-toolbar">
+      <div class="knowledge-toolbar-copy">
+        <strong>مستودع المعرفة</strong>
+        <span class="count">${items.length} عنصر محفوظ — الكتب والفيديوهات والمصادر والملاحظات في مكان واحد</span>
+      </div>
+      <div class="knowledge-actions">
+        <button type="button" class="btn btn-xs" onclick="openKnowledgeProject('كتاب')">+ كتاب</button>
+        <button type="button" class="btn btn-xs" onclick="openKnowledgeProject('فيديو')">+ فيديو</button>
+        <button type="button" class="btn btn-xs" onclick="openKnowledgeProject('كورس')">+ كورس</button>
+        <button type="button" class="btn btn-xs btn-ghost" onclick="openKnowledgeSource()">+ مصدر / رابط</button>
+        <button type="button" class="btn btn-xs btn-ghost" onclick="openKnowledgeNote()">+ ملاحظة</button>
+      </div>
+    </div>
+    <div class="jfilter knowledge-filters" id="jf-knowledge">
+      ${filters.map(([k, label]) =>
+        `<button type="button" class="jtab${f === k ? ' on' : ''}" data-k="${k}" onclick="jnFilterSpace('knowledge', '${k}')">${label}</button>`).join('')}
     </div>
     ${filtered.length ? `
-      <div class="lib-grid" style="margin-top:10px">
-        ${filtered.map((it) => it.kind === 'proj' ? jnProjectCard(m, it.proj) : jnExpCard(it.exp)).join('')}
+      <div class="lib-grid knowledge-grid">
+        ${filtered.map(renderItem).join('')}
       </div>`
-      : '<div class="empty-box" style="margin-top:10px"><strong>لا محتوى في هذا القسم بعد</strong><p>أكمل كتبًا أو فيديوهات أو كورسات، أو سجّل تجاربك من «كتابة تجربة» أو نهاية يوميات اليوم.</p></div>'}`;
+      : `<div class="empty-box knowledge-empty">
+          <strong>${items.length ? 'لا توجد عناصر في هذا التصنيف' : 'ابدأ ببناء مستودع معرفتك'}</strong>
+          <p>أضف كتابًا أو فيديو أو رابطًا لمقال أو دورة، واكتب خلاصة ما تريد تذكّره. ستبقى العناصر قابلة للتعديل والرجوع إليها.</p>
+          <div class="knowledge-actions">
+            <button type="button" class="btn btn-xs" onclick="openKnowledgeSource()">إضافة أول مصدر</button>
+            <button type="button" class="btn btn-xs btn-ghost" onclick="openKnowledgeNote()">كتابة ملاحظة</button>
+          </div>
+        </div>`}`;
+}
+
+function openKnowledgeProject(type) {
+  openProjectModal(null);
+  const select = document.getElementById('pj-type');
+  if (select) {
+    select.value = type;
+    onPjTypeChange();
+  }
+}
+function openKnowledgeSource() {
+  openJournalModal('knowledge', null, 'source');
+}
+function openKnowledgeNote() {
+  openJournalModal('knowledge', null, 'exp');
+}
+function jnKnowledgePostCard(p) {
+  const labels = { book: 'كتاب', video: 'فيديو', source: 'مصدر', exp: 'ملاحظة معرفية' };
+  const icons = { book: '📕', video: '🎬', source: '🔗', exp: '📖' };
+  const kind = p.sub || 'exp';
+  const url = noorSafeUrl(p.link);
+  const excerpt = String(p.text || '').trim();
+  return `
+    <article class="lib-card knowledge-post-card" onclick="openPostDetails(${p.id})" title="عرض التفاصيل">
+      <div class="lib-cover ${p.cover ? '' : 'lib-cover-empty'}">
+        ${p.cover
+          ? `<img src="${cachedCover(p.cover)}" alt="" loading="lazy" onerror="this.closest('.lib-cover').innerHTML='<span class=&quot;lib-type&quot;> ${icons[kind] || '📖'} </span>'">`
+          : `<span class="lib-type">${icons[kind] || '📖'}</span>`}
+      </div>
+      <div class="lib-body">
+        <div class="lib-title">${esc(p.title)}</div>
+        ${p.author ? `<div class="lib-author">${esc(p.author)}</div>` : ''}
+        ${p.rating > 0 ? `<div class="lib-rating">${starsHTML(p.rating)}</div>` : ''}
+        ${excerpt ? `<div class="lib-summary">${esc(excerpt.length > 180 ? excerpt.slice(0, 180) + '…' : excerpt)}</div>` : '<div class="lib-summary">لا توجد خلاصة بعد — افتح العنصر وأضف ملاحظاتك.</div>'}
+        <div class="lib-foot">
+          <span class="chip jchip">${icons[kind] || '📖'} ${labels[kind] || 'معرفة'}</span>
+          ${url ? '<span class="chip chip-blue">رابط محفوظ</span>' : ''}
+        </div>
+      </div>
+      <div class="knowledge-post-actions">
+        ${url ? `<a class="btn btn-xs btn-ghost" href="${esc(url)}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">فتح المصدر ↗</a>` : ''}
+        <button type="button" class="btn btn-xs btn-ghost" onclick="event.stopPropagation();openJournalModal('knowledge', ${p.id})">تعديل</button>
+        <button type="button" class="btn btn-xs btn-ghost" onclick="event.stopPropagation();archiveKnowledgePost(${p.id})">أرشفة</button>
+      </div>
+    </article>`;
+}
+async function archiveKnowledgePost(id) {
+  if (!confirm('أرشفة هذا العنصر؟ سيبقى في الأرشيف ويمكن استعادته.')) return;
+  try {
+    NoorStore.archivePost(id);
+    showToast('تمت أرشفة العنصر');
+    await renderJournal();
+  } catch (e) { showToast(e.message, 'bad'); }
 }
 
 function jnFilterSpace(space, k) {
