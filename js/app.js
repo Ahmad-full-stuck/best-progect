@@ -4905,7 +4905,7 @@ function visionTimelineHTML(st) {
   let yline = '';
   for (let y = 1; y <= st.maxYear; y++) {
     const ok = st.yearsCovered.indexOf(y) >= 0;
-    yline += '<div class="ycell ' + (ok ? 'ok' : 'gap') + (y === st.curYear ? ' cur' : '') + '" title="السنة ' + y + (ok ? ' — لها أهداف ✓' : ' — بلا أهداف بعد') + '">' + y + '</div>';
+    yline += '<button type="button" class="ycell ' + (ok ? 'ok' : 'gap') + (y === st.curYear ? ' cur' : '') + '" onclick="jumpToVisionYear(' + y + ')" title="السنة ' + y + (ok ? ' — لها أهداف؛ اضغط للانتقال إليها' : ' — بلا أهداف بعد؛ اضغط للتخطيط لها') + '">' + y + '</button>';
   }
   return '<h4 class="insight-h">الخط الزمني <span class="count">— الأخضر له أهداف، الفارغ بانتظار التخطيط، والإطار السميك موقعك الحالي</span></h4><div class="yline">' + yline + '</div>';
 }
@@ -4940,8 +4940,8 @@ function visionBodyHTML() {
     const stateCls = y === curYear ? 'cur open' : ('collapsed ' + (y < curYear ? 'past' : 'future'));
     const yearChip = y === curYear ? '<span class="chip chip-warn">أنت هنا</span>' : (y < curYear && ys.pct >= 100 ? '<span class="chip chip-done">✅ اكتملت</span>' : '');
     hier += `
-      <div class="yh ${stateCls}">
-        <div class="yh-head" onclick="toggleYh(this)" title="${y === curYear ? 'طي السنة' : 'فتح السنة'}">
+      <div id="vision-year-${y}" class="yh ${stateCls}">
+        <div class="yh-head" role="button" tabindex="0" aria-expanded="${y === curYear ? 'true' : 'false'}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleYh(this)}" onclick="toggleYh(this)" title="${y === curYear ? 'طي السنة' : 'فتح السنة'}">
           <div class="yh-ring">
             <svg class="ring" viewBox="0 0 48 48" width="48" height="48" aria-hidden="true">
               <circle class="bg" cx="24" cy="24" r="18"></circle>
@@ -5013,6 +5013,19 @@ function toggleYh(btn) {
   if (!yh) return;
   yh.classList.toggle('collapsed');
   yh.classList.toggle('open');
+  btn.setAttribute('aria-expanded', yh.classList.contains('open') ? 'true' : 'false');
+}
+function jumpToVisionYear(year) {
+  const node = document.getElementById('vision-year-' + Math.max(1, Number(year) || 1));
+  if (!node) return;
+  if (node.classList.contains('collapsed')) {
+    node.classList.remove('collapsed');
+    node.classList.add('open');
+  }
+  const head = node.querySelector('.yh-head');
+  if (head) head.setAttribute('aria-expanded', 'true');
+  node.scrollIntoView({ behavior: window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+  if (head) head.focus({ preventScroll: true });
 }
 
 function goalDurationLabel(g) {
