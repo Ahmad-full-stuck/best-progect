@@ -318,3 +318,69 @@
   #content .archive-view .archive-row { align-items:flex-start; flex-wrap:wrap; }
   #content .archive-view .archive-actions { width:100%; }
 }
+
+
+/* Shell and page rhythm: one visible title per page, with the top bar reserved for utilities. */
+.workspace-header {
+  flex: 0 0 auto;
+  align-items: center;
+  min-height: 58px;
+  padding: 10px clamp(16px, 2.5vw, 38px);
+  border-bottom: 1px solid var(--border-light);
+  background: var(--bg);
+}
+.workspace-header .workspace-info { display: none; }
+.workspace-header .header-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  width: 100%;
+  margin-inline-start: auto;
+}
+.workspace-header .workspace-date,
+.workspace-header .workspace-clock { padding: 0; }
+.content-area {
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: clamp(18px, 2vw, 30px) clamp(14px, 2.4vw, 36px) 96px;
+}
+#content { min-width: 0; }
+#content .page-head {
+  align-items: flex-end;
+  gap: var(--space-4);
+}
+#content .page-head > div:first-child { min-width: 0; }
+#content .page-head .page-title {
+  margin: 0;
+  font-size: clamp(26px, 2.2vw, 32px);
+  line-height: 1.35;
+}
+#content .page-head .page-sub {
+  margin-top: 5px;
+  line-height: 1.7;
+}
+#content .timer-view { display: flex; flex-direction: column; gap: var(--space-4); }
+#content .timer-view > .timer-page-head { margin: 0; }
+#content .timer-page-kicker {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--accent-hover);
+  font-size: 11px;
+  font-weight: 800;
+}
+@media (max-width: 860px) {
+  .workspace-header { min-height: 52px; padding: 8px 14px; }
+  .workspace-header .header-right { gap: 8px; }
+  .content-area { padding: 18px 16px 84px; }
+  #content .page-head { align-items: flex-start; }
+}
+@media (max-width: 600px) {
+  .workspace-header .workspace-clock { display: none; }
+  .content-area { padding: 14px 12px 72px; }
+  #content .page-head .page-title { font-size: 25px; }
+  #content .page-head .page-sub { font-size: 12px; }
+}
