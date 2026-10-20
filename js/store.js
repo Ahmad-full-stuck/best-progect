@@ -1627,6 +1627,7 @@
     return {
       id: num(p.id, 0), space: p.space || '', sub: p.sub || '', title: p.title || '', text: p.text || '',
       cover: p.cover || '',
+      link: p.link || '',
       author: p.author || '',
       rating: p.rating !== undefined && p.rating !== null && p.rating !== '' ? Math.min(5, Math.max(0, Number(p.rating))) : 0,
       steps: cleanPostSteps(p.steps), completed_at: p.completed_at || null,
@@ -1668,6 +1669,7 @@
     var p = {
       id: nextId(db.posts), space: space, sub: String(b.sub || ''), title: title, text: String(b.text || ''),
       cover: String(b.cover || ''),
+      link: String(b.link || ''),
       author: String(b.author || ''),
       rating: b.rating !== undefined && b.rating !== null && b.rating !== '' ? Math.min(5, Math.max(0, Number(b.rating))) : 0,
       steps: JSON.stringify(steps), tags: JSON.stringify(tags), completed_at: null,
@@ -1689,6 +1691,7 @@
     if (b.text !== undefined) p.text = String(b.text || '');
     if (b.sub !== undefined) p.sub = String(b.sub || '');
     if (b.cover !== undefined) p.cover = String(b.cover || '');
+    if (b.link !== undefined) p.link = String(b.link || '');
     if (b.author !== undefined) p.author = String(b.author || '');
     if (b.rating !== undefined && b.rating !== null && b.rating !== '') p.rating = Math.min(5, Math.max(0, Number(b.rating)));
     if (b.steps !== undefined) p.steps = JSON.stringify(Array.isArray(b.steps) ? b.steps.map(function (s) { return { text: String((s && s.text) || ''), done: !!(s && s.done) }; }) : []);
