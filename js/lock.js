@@ -8,8 +8,8 @@
        node -e "console.log(require('crypto').createHash('sha256').update('رمزك هنا','utf8').digest('hex'))" */
     passSha256: '43d998f7250ec60051b1e0b13acdf29f7394441680f17d54aa48fc40b29345d0',
     seedUrl: 'data/seed.json',
-    storeSrc: 'js/store.js?v=19',
-    appSrc: 'js/app.js?v=90',
+    storeSrc: 'js/store.js?v=20',
+    appSrc: 'js/app.js?v=91',
     flag: 'noor_unlocked'
   };
 
