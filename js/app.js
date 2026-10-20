@@ -2354,11 +2354,12 @@ function libCardHTML(p) {
   const done = !!p.completed_at;
   const hasOpen = !!(p.file || p.link || p.video_url || (p.video_urls && p.video_urls.length));
   const isVidT = p.type === 'فيديو' || p.type === 'كورس';
+  const typeClass = p.type === 'كتاب' ? 't-book' : (p.type === 'فيديو' ? 't-video' : (p.type === 'كورس' ? 't-course' : ''));
   const pt = projectType(p.type);
   const rating = p.rating > 0 ? `<div class="lib-stars">${starsHTML(p.rating)}</div>` : '';
   const summary = (done && p.summary) ? `<p class="lib-summary">${esc(p.summary.length > 120 ? p.summary.slice(0, 120) + '…' : p.summary)}</p>` : '';
   return `
-  <div class="lib-card ${done ? 'lib-done' : ''}" onclick="${hasOpen ? `openLibReader(${p.id})` : `openProjectTasksModal(${p.id})`}">
+  <div class="lib-card ${typeClass} ${done ? 'lib-done' : ''}" onclick="${hasOpen ? `openLibReader(${p.id})` : `openProjectTasksModal(${p.id})`}">
     <div class="lib-card-cover">${libCoverHTML(p)}${isVidT && hasOpen ? '<span class="vid-badge">▶</span>' : ''}</div>
     <div class="lib-card-body">
       <div class="lib-card-type">${pt.icon} ${esc(pt.title)}</div>
