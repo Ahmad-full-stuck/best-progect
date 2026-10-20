@@ -1883,11 +1883,7 @@
   }
 
   function factoryReset() {
-    /* الاحتفاظ بإعدادات المؤقت الأساسية فقط */
-    var timerSettings = {};
-    ['timer_mode', 'timer_focus_min', 'timer_alarm_time', 'timer_project_id', 'timer_project_sel', 'cycles_per_long'].forEach(function (k) {
-      if (db.settings[k] !== undefined) timerSettings[k] = db.settings[k];
-    });
+    /* إعادة ضبط حقيقية: لا تُبقي إعدادات أو معرّفات مشاريع قديمة بعد مسح الخطة. */
     /* مسح كل البيانات */
     db.projects = [];
     db.project_tasks = [];
@@ -1903,18 +1899,17 @@
     db.barrier_hosts = [];
     db.notes = [];
     db.posts = [];
+    db.experiences = [];
+    db.exp_categories = [];
     db.challenges = [];
-    db.settings = {};
-    /* إعادة جميع الإعدادات للقيم الافتراضية */
-    var defaults = DEFAULTS;
-    for (var k in defaults) if (defaults.hasOwnProperty(k)) db.settings[k] = timerSettings[k] || defaults[k];
+    db.settings = Object.assign({}, DEFAULTS);
     /* مسح بيانات اليومية من localStorage */
     var ls = journalStorage();
     if (ls) {
       var keysToRemove = [];
       for (var i = 0; i < ls.length; i++) {
         var key = ls.key(i);
-        if (key && (key.indexOf('noor_') === 0 || key.indexOf('noor_journal') === 0)) {
+        if (key && key !== 'noor_factory_reset_backup' && (key.indexOf('noor_') === 0 || key.indexOf('noor_journal') === 0)) {
           keysToRemove.push(key);
         }
       }
