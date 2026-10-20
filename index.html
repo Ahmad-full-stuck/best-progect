@@ -6,27 +6,9 @@
     <title>نُور — نظام إدارة الحياة</title>
     <link rel="icon" href="data:,">
     <link rel="stylesheet" href="css/style.css?v=64">
+    <link rel="stylesheet" href="css/refinements.css?v=1">
 </head>
-<body>
-
-<!-- ===== بوابة الدخول (مستخدم واحد) ===== -->
-<div class="noor-lock" id="noorLock" role="dialog" aria-modal="true" aria-labelledby="lockTitle">
-  <div class="noor-lock__card" id="lockCard">
-    <div class="noor-lock__brand">
-      <span class="noor-lock__mark">ن</span>
-      <h1 class="noor-lock__title" id="lockTitle">نُور</h1>
-      <p class="noor-lock__sub">نظام إدارة الحياة — نسخة شخصية</p>
-    </div>
-    <form class="noor-lock__form" id="lockForm" autocomplete="off">
-      <label class="noor-lock__label" for="lockInput">رمز الدخول</label>
-      <input class="noor-lock__input" id="lockInput" type="password" placeholder="••••••••"
-             autocomplete="off" spellcheck="false" autofocus>
-      <p class="noor-lock__msg" id="lockMsg" hidden></p>
-      <button class="noor-lock__btn" type="submit">فتح نُور</button>
-    </form>
-    <p class="noor-lock__hint">هذه النسخة لمستخدم واحد.</p>
-  </div>
-</div>
+<body class="noor-unlocked">
 
 <div class="app">
 
@@ -138,6 +120,6 @@
 
 <div id="toasts"></div>
 
-        <script src="js/lock.js?v=1"></script>
+        <script src="js/lock.js?v=2"></script>
 </body>
 </html>
