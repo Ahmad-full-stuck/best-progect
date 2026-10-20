@@ -4522,7 +4522,7 @@ async function renderArchive() {
         <p class="page-sub">${isHist ? 'تاريخك يومًا بيوم — اضغط على أي مربع لعرض كل ما أدخلته في ذلك اليوم' : 'كل ما أنجزته أو أرشفته، لا يُحذف نهائيًا'}</p>
       </div>
     </div>
-    <div class="jmodes" style="margin-bottom:14px">
+    <div class="jmodes">
       <button class="jmode${!isHist ? ' on' : ''}" onclick="setArchiveMode('list')">📋 القائمة</button>
       <button class="jmode${isHist ? ' on' : ''}" onclick="setArchiveMode('history')">🗓 التاريخ</button>
     </div>
