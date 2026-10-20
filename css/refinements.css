@@ -260,3 +260,32 @@
 
 /* Preserve the sharp, classic year-cell geometry now that timeline cells are buttons. */
 .ycell { appearance: none; -webkit-appearance: none; border-radius: 0; padding: 0; font-family: inherit; }
+
+/* Search row inside the knowledge vault */
+.knowledge-search-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  margin-block: var(--space-3) var(--space-4);
+  background: var(--surface-2);
+  border: var(--border-w) solid var(--border-light);
+}
+.knowledge-search-row .input {
+  flex: 1 1 240px;
+  width: auto;
+  min-width: 160px;
+  height: 44px;
+  background: var(--white);
+}
+.knowledge-search-row .count {
+  min-width: 54px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 420px) {
+  .knowledge-search-row { padding: var(--space-2); }
+  .knowledge-search-row .input { flex-basis: 100%; }
+  .knowledge-search-row .btn { flex: 1 1 auto; }
+}
