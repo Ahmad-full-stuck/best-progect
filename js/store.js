@@ -1818,7 +1818,9 @@
     var ls = journalStorage();
     if (ls) {
       var qRaw = ls.getItem(JOURNAL_QKEY);
-      if (qRaw) journalData.questions = JSON.parse(qRaw);
+      if (qRaw) {
+        try { journalData.questions = JSON.parse(qRaw); } catch (e) { journalData.questions = undefined; }
+      }
       var journalEntries = {};
       for (var i = 0; i < ls.length; i++) {
         var key = ls.key(i);
