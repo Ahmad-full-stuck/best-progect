@@ -2,7 +2,7 @@
 (function () {
   'use strict';
 
-  var STORE_SRC = 'js/store.js?v=22';
+  var STORE_SRC = 'js/store.js?v=23';
   var APP_SRC = 'js/app.js?v=100';
   var SEED_URL = 'data/seed.json';
 
