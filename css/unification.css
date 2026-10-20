@@ -156,3 +156,25 @@ button, input, select, textarea { font-family: var(--font); }
   #content .archive-row, #content .hist-cell, #content .ycell,
   #content .dash-kpi, #content .mode-tab { transition: none !important; }
 }
+
+
+/* المكتبة الشخصية ومصادر المعرفة: لا يتغير لون الهيكل الأساسي بحسب نوع العنصر. */
+#content .lib-card.t-book,
+#content .lib-card.t-video,
+#content .lib-card.t-course {
+  border-top-color: var(--accent);
+}
+#content .lib-card.t-book .chip.jchip,
+#content .lib-card.t-video .chip.jchip,
+#content .lib-card.t-course .chip.jchip {
+  background: var(--accent-soft);
+  border-color: var(--accent-l2);
+  color: var(--accent-hover);
+}
+#content #jf-knowledge .jtab[data-k="كتاب"].on,
+#content #jf-knowledge .jtab[data-k="فيديو"].on,
+#content #jf-knowledge .jtab[data-k="كورس"].on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--white);
+}
