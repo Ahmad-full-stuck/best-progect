@@ -1637,7 +1637,7 @@ async function renderProjects() {
     <div class="projects-view">
     <div class="page-head">
       <div>
-        <h2 class="page-title">المشاريع</h2>
+        <h2 class="page-title">مشاريع التركيز</h2>
         <p class="page-sub">مشروع واحد فقط لكل هدف يظهر هنا — أنجز الحالي ليرتفع التالي تلقائيًا</p>
       </div>
       <button class="btn btn-lg" onclick="openProjectModal()">+ مشروع جديد</button>
@@ -2310,7 +2310,7 @@ async function renderLibrary() {
     <div class="library-view">
     <div class="page-head">
       <div>
-        <h2 class="page-title">المكتبة الشخصية</h2>
+        <h2 class="page-title">مكتبتك الشخصية</h2>
         <p class="page-sub">بيئة معزولة للقراءة والمشاهدة — اقرأ الكتاب وشغّل الدرس من هنا، والمكتمل يظهر ملخصه وتقييمه</p>
       </div>
       <div class="page-actions">
@@ -4300,7 +4300,7 @@ async function renderStats() {
     <div class="stats-view">
     <div class="page-head">
       <div>
-        <h2 class="page-title">الإحصائيات</h2>
+        <h2 class="page-title">ملخص الأداء</h2>
         <p class="page-sub">أسبوعك يبدأ ${fmtDateAr(st.week_start)} — ${st.focus_min} دقيقة تركيز — ${st.elapsed_days} من 7 أيام</p>
       </div>
       <div class="page-actions">
@@ -4325,7 +4325,7 @@ async function renderStats() {
             <div class="dash-overview">
               <div class="dash-ring-wrap">
                 <svg class="ring" viewBox="0 0 96 96" width="96" height="96"><circle cx="48" cy="48" r="42"></circle><circle class="fg" cx="48" cy="48" r="42" style="stroke-dasharray:${RING_C};stroke-dashoffset:${ringOffset}"></circle></svg>
-                <div class="ring-label">${ys.pct}%</div>
+                <div class="ring-label">${overallPct}%</div>
               </div>
               <div class="dash-ov-stats">
                 <div class="dov-row"><span class="dov-label">الهدف</span><span class="dov-val">${totalGoal}</span></div>
@@ -4515,7 +4515,7 @@ async function renderArchive() {
     <div class="archive-view">
     <div class="page-head">
       <div>
-        <h2 class="page-title">الأرشيف</h2>
+        <h2 class="page-title">أرشيفك</h2>
         <p class="page-sub">${isHist ? 'تاريخك يومًا بيوم — اضغط على أي مربع لعرض كل ما أدخلته في ذلك اليوم' : 'كل ما أنجزته أو أرشفته، لا يُحذف نهائيًا'}</p>
       </div>
     </div>
@@ -4871,7 +4871,7 @@ async function renderVision() {
   $('#content').innerHTML = `
     <div class="vision-view">
       <div class="page-head vision-page-head">
-        <div><span class="vision-page-kicker">نظام الحياة / التخطيط</span><h2 class="page-title">النظرة</h2><p class="page-sub">اربط هويتك وقيمك بوجهتك، ثم حوّل الصورة الكبيرة إلى أهداف يمكن العمل عليها.</p></div>
+        <div><span class="vision-page-kicker">نظام الحياة / التخطيط</span><h2 class="page-title">بوصلة حياتك</h2><p class="page-sub">اربط هويتك وقيمك بوجهتك، ثم حوّل الصورة الكبيرة إلى أهداف يمكن العمل عليها.</p></div>
         <div class="page-actions vision-page-actions">
           <button type="button" class="btn btn-ghost" onclick="openValueModal(null)">+ قيمة حياتية</button>
           <button type="button" class="btn btn-ghost" onclick="openNoteModal()">+ فكرة سريعة</button>
@@ -6596,7 +6596,7 @@ async function renderJournal() {
     <div class="journal-view">
     <div class="page-head">
       <div>
-        <h2 class="page-title">التدوين الشامل</h2>
+        <h2 class="page-title">مساحاتك وتاريخك</h2>
         <p class="page-sub">المساحة الداخلية (أفكارك) والمساحة الخارجية (ما تتعلمه من العالم)</p>
       </div>
       <div class="page-actions">
