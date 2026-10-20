@@ -198,3 +198,123 @@
 @media(max-width:1050px){#content .vision-compass-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#content .vision-values-panel{grid-column:1/-1}#content .vision-roadmap-panel .yline{grid-template-columns:repeat(4,minmax(0,1fr))}#content .vision-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:700px){#content .vision-view{gap:20px}#content .vision-workspace{gap:28px}#content .vision-view .vision-page-head{align-items:flex-start}#content .vision-page-actions{width:100%;justify-content:flex-start}#content .vision-hero-main{grid-template-columns:minmax(0,1fr) 88px;padding:16px;gap:12px}#content .vision-hero-ring-wrap{width:84px;height:84px}#content .vision-hero-ring-label strong{font-size:20px}#content .vision-hero-copy h3{font-size:20px}#content .vision-hero-meta{gap:8px}#content .vision-stat-grid{gap:8px}#content .vision-stat{padding:12px}#content .vision-stat-number{font-size:24px}#content .vision-compass-grid{grid-template-columns:minmax(0,1fr)}#content .vision-values-panel{grid-column:auto}#content .vision-section-heading{align-items:flex-start;flex-direction:column;gap:12px}#content .vision-section-heading>.btn{align-self:flex-start}#content .vision-idea-entry{grid-template-columns:minmax(0,1fr)}#content .vision-idea-entry .btn{width:100%}#content .vision-ideas-grid{grid-template-columns:minmax(0,1fr)}#content .vision-roadmap-panel{padding:8px}#content .vision-roadmap-panel .yline{grid-template-columns:repeat(2,minmax(0,1fr))}#content .vision-roadmap-panel .ycell{min-height:82px;padding:8px}#content .vision-years-tree .yh-head{padding:12px;gap:8px}#content .vision-years-tree .yh-ring{flex-basis:40px;width:40px;height:40px}#content .vision-years-tree .yh-ring .ring{width:40px;height:40px}#content .vision-years-tree .yh-head>.btn{margin-inline-start:auto}}
 @media(max-width:390px){#content .vision-hero-main{grid-template-columns:minmax(0,1fr) 72px;padding:12px}#content .vision-hero-ring-wrap{width:70px;height:70px}#content .vision-stat{padding:8px}#content .vision-stat-number{font-size:20px}#content .vision-hero-meta{flex-direction:column;gap:4px}#content .vision-roadmap-panel .ycell-mark,#content .vision-roadmap-panel .ycell-bottom{font-size:9px}}
+
+/* إحصائيات: هيكل مرئي واحد من الملخص إلى التحليلات. */
+#content .stats-view { display:flex; flex-direction:column; gap:var(--space-4); min-width:0; }
+#content .stats-view > .page-head { margin-bottom:0; }
+#content .stats-view .dash-kpis { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:var(--space-3); margin:0; }
+#content .stats-view .dash-kpi { display:flex; flex-direction:column; align-items:flex-start; gap:var(--space-2); min-width:0; min-height:112px; padding:var(--space-4); border:1px solid var(--border-light); background:var(--white); }
+#content .stats-view .dk-num { font-size:clamp(24px,2.2vw,34px); line-height:1.15; font-variant-numeric:tabular-nums; }
+#content .stats-view .dk-label { color:var(--ink-3); font-size:var(--fs-xs); line-height:1.6; }
+#content .stats-view .dk-bar { width:100%; height:5px; margin-top:auto; overflow:hidden; background:var(--paper); border:0; }
+#content .stats-view .dk-fill { height:100%; background:var(--accent); }
+#content .stats-view .dash-row-2 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--space-4); align-items:stretch; }
+#content .stats-view .dash-card { min-width:0; height:100%; margin:0; border:1px solid var(--border-light); background:var(--white); }
+#content .stats-view .dash-card-head { display:flex; align-items:center; justify-content:space-between; gap:var(--space-3); min-height:56px; padding:var(--space-3) var(--space-4); border-bottom:1px solid var(--border-light); background:var(--surface-2); }
+#content .stats-view .dash-card-head h3 { min-width:0; margin:0; font-family:var(--font-title); font-size:var(--fs-md); line-height:1.55; }
+#content .stats-view .dash-card-body { min-width:0; padding:var(--space-4); }
+#content .stats-view .dash-overview { display:grid; grid-template-columns:auto minmax(0,1fr); align-items:center; gap:var(--space-4); }
+#content .stats-view .dash-ov-stats { min-width:0; }
+#content .stats-view .dov-row { display:flex; align-items:center; justify-content:space-between; gap:var(--space-3); padding:var(--space-2) 0; border-bottom:1px solid var(--border-light); }
+#content .stats-view .dov-row:last-child { border-bottom:0; }
+#content .stats-view .dov-label { color:var(--ink-3); font-size:var(--fs-sm); }
+#content .stats-view .dov-val { font-weight:800; font-variant-numeric:tabular-nums; }
+#content .stats-view .wb-wrap { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:var(--space-2); min-width:0; }
+#content .stats-view .wb-col { min-width:0; }
+#content .stats-view .wb-day, #content .stats-view .wb-val { font-size:var(--fs-xs); overflow-wrap:anywhere; }
+#content .stats-view .dash-table { width:100%; min-width:570px; border-collapse:collapse; }
+#content .stats-view .dash-table th, #content .stats-view .dash-table td { padding:10px 9px; border-bottom:1px solid var(--border-light); text-align:start; white-space:nowrap; }
+#content .stats-view .dash-table th { background:var(--surface-2); color:var(--ink-2); font-size:var(--fs-xs); }
+#content .stats-view .dash-table tr:hover td { background:var(--wash-warm); }
+#content .stats-view .dash-card-body:has(.dash-table), #content .stats-view .mg-wrap { min-width:0; overflow-x:auto; }
+#content .stats-view .mg-header, #content .stats-view .mg-row { min-width:740px; }
+#content .stats-view .dash-reward, #content .stats-view .dash-sentence { padding:var(--space-4); margin:0; line-height:1.8; border-inline-start:4px solid var(--accent); background:var(--surface-2); }
+#content .stats-view .dash-reward { border-inline-start-color:var(--green); }
+
+/* التدوين الشامل: تبويبات مدمجة ومساحات ذات أحجام متوازنة. */
+#content .journal-view { display:flex; flex-direction:column; gap:var(--space-4); min-width:0; }
+#content .journal-view > .page-head { margin-bottom:0; }
+#content .journal-view > .jmodes, #content .archive-view > .jmodes { display:inline-flex; align-self:flex-start; flex:0 0 auto; flex-wrap:wrap; width:auto; max-width:100%; gap:0; margin:0; border:1px solid var(--border-light); background:var(--surface-2); overflow:hidden; }
+#content .journal-view > .jmodes .jmode, #content .archive-view > .jmodes .jmode { flex:0 0 auto; min-width:110px; min-height:40px; padding:var(--space-2) var(--space-4); border:0; border-inline-end:1px solid var(--border-light); background:transparent; color:var(--ink-2); }
+#content .journal-view > .jmodes .jmode:last-child, #content .archive-view > .jmodes .jmode:last-child { border-inline-end:0; }
+#content .journal-view > .jmodes .jmode.on, #content .archive-view > .jmodes .jmode.on { background:var(--accent); color:var(--white); }
+#content .journal-view .page-actions { display:flex; flex-wrap:wrap; gap:var(--space-2); }
+#content .journal-view .knowledge-toolbar { border-inline-start-color:var(--accent); }
+#content .journal-view .knowledge-toolbar-copy { min-width:0; }
+#content .journal-view .spaces-grid, #content .journal-view .sec-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--space-3); align-items:stretch; }
+#content .journal-view .space-card, #content .journal-view .sec-card { height:100%; min-width:0; background:var(--white); border:1px solid var(--border-light); }
+#content .journal-view .space-card .item-title, #content .journal-view .sec-title { line-height:1.55; overflow-wrap:anywhere; }
+#content .journal-view .space-card .item-sub, #content .journal-view .sec-sub { color:var(--ink-3); line-height:1.7; }
+#content .journal-view .sec-card { grid-template-columns:42px minmax(0,1fr) auto; }
+#content .journal-view .sec-num { align-self:start; }
+#content .journal-view .jcard { min-width:0; margin:0 0 var(--space-4); }
+#content .journal-view .jcard > .card-head { flex-wrap:wrap; gap:var(--space-2); }
+#content .journal-view .jentry, #content .journal-view .journal-item, #content .journal-view .note-item { min-width:0; }
+#content .journal-view .jentry { overflow-wrap:anywhere; }
+#content .journal-view .jentry a, #content .journal-view .lib-summary { overflow-wrap:anywhere; }
+#content .journal-view .knowledge-post-card { min-width:0; height:100%; }
+#content .journal-view .knowledge-actions { display:flex; flex-wrap:wrap; gap:var(--space-2); }
+
+/* المشاريع: بطاقة المشروع الأساسية باقية، لكن التخطيط والمعلومات لا تتزاحم. */
+#content .projects-view { display:flex; flex-direction:column; gap:var(--space-4); min-width:0; }
+#content .projects-view > .page-head { margin-bottom:0; }
+#content .projects-view > .grid-2 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--space-4); }
+#content .projects-view .pcard { min-width:0; height:100%; margin:0; }
+#content .projects-view .pcard-top { min-width:0; align-items:flex-start; }
+#content .projects-view .item-title, #content .projects-view .item-sub { overflow-wrap:anywhere; white-space:normal; }
+#content .projects-view .pcard-tags { align-items:flex-start; flex-wrap:wrap; }
+#content .projects-view .pcard-tags > span:first-child { display:flex; align-items:center; flex-wrap:wrap; gap:6px; min-width:0; }
+#content .projects-view .pcard-actions { display:flex; align-items:center; flex-wrap:wrap; gap:var(--space-2); padding-top:var(--space-2); border-top:1px solid var(--border-light); }
+#content .projects-view .pdone-item { min-width:0; margin-top:var(--space-2); }
+#content .projects-view .pdone-item .item-sub { white-space:normal; overflow-wrap:anywhere; }
+
+/* المكتبة الشخصية: إحصاءات وتصنيفات واضحة، وتوازن مستمر لبطاقات المحتوى. */
+#content .library-view { display:flex; flex-direction:column; gap:var(--space-4); min-width:0; }
+#content .library-view > .page-head { margin-bottom:0; }
+#content .library-view .lib-hero { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:var(--space-3); margin:0; }
+#content .library-view .lib-stat-card { display:flex; flex-direction:column; align-items:stretch; justify-content:flex-start; gap:var(--space-2); min-width:0; min-height:116px; padding:var(--space-3); border:1px solid var(--border-light); background:var(--white); text-align:start; }
+#content .library-view .lib-stat-total { background:var(--accent-soft); border-color:var(--accent-l2); }
+#content .library-view .lib-stat-num { font-size:clamp(24px,2vw,34px); line-height:1.2; overflow-wrap:anywhere; }
+#content .library-view .lib-stat-label { font-size:var(--fs-xs); line-height:1.5; }
+#content .library-view .lib-stat-card .count { line-height:1.5; }
+#content .library-view .lib-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(205px,1fr)); gap:var(--space-4); align-items:stretch; }
+#content .library-view .lib-card { min-width:0; height:100%; border:1px solid var(--border-light); background:var(--white); }
+#content .library-view .lib-card:hover { background:var(--wash-warm); }
+#content .library-view .lib-card-body { min-width:0; flex:1; }
+#content .library-view .lib-card-title, #content .library-view .lib-card-author, #content .library-view .lib-summary { overflow-wrap:anywhere; }
+
+/* الأرشيف: لوحة فلاتر واحدة وصفوف سهلة المسح مع الحفاظ على شبكة التاريخ. */
+#content .archive-view { display:flex; flex-direction:column; gap:var(--space-4); min-width:0; }
+#content .archive-view > .page-head { margin-bottom:0; }
+#content .archive-view .archive-filters { display:grid; grid-template-columns:minmax(200px,1fr) minmax(145px,220px) minmax(125px,170px); gap:var(--space-3); padding:var(--space-3); margin:0; border:1px solid var(--border-light); background:var(--surface-2); }
+#content .archive-view .archive-filters .input { width:100%; min-width:0; }
+#content .archive-view .archive-list { display:flex; flex-direction:column; gap:var(--space-2); min-width:0; }
+#content .archive-view .archive-row { gap:var(--space-3); padding:var(--space-3) var(--space-4); border:1px solid var(--border-light); background:var(--white); }
+#content .archive-view .archive-main { min-width:0; overflow-wrap:anywhere; }
+#content .archive-view .archive-actions { display:flex; flex-wrap:wrap; gap:var(--space-2); }
+#content .archive-view .hist-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:var(--space-4); }
+#content .archive-view .hist-month { min-width:0; padding:var(--space-3); border:1px solid var(--border-light); background:var(--white); }
+#content .archive-view .hist-cells { grid-template-columns:repeat(7,minmax(0,1fr)); gap:4px; }
+#content .archive-view .hist-cell { min-width:0; min-height:0; aspect-ratio:1; }
+#content .archive-view .hist-head, #content .archive-view .hist-legend { display:flex; flex-wrap:wrap; align-items:center; gap:var(--space-2); }
+
+/* المؤقت مرجع تصميم محفوظ؛ لا يعاد تشكيل الحلقة أو توزيع المؤقت. */
+#content .timer-view, #content .timer-view .timer-wrap,
+#content .timer-view .timer-main, #content .timer-view .timer-side { min-width:0; }
+
+@media (max-width:1050px) {
+  #content .stats-view .dash-kpis { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  #content .library-view .lib-hero { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  #content .archive-view .hist-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width:760px) {
+  #content .stats-view .dash-row-2 { grid-template-columns:minmax(0,1fr); }
+  #content .journal-view .spaces-grid, #content .journal-view .sec-grid { grid-template-columns:minmax(0,1fr); }
+  #content .projects-view > .grid-2 { grid-template-columns:minmax(0,1fr); }
+  #content .projects-view .pcard { padding:var(--space-3); }
+  #content .library-view .lib-hero { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  #content .archive-view .archive-filters { grid-template-columns:minmax(0,1fr); }
+  #content .archive-view .hist-grid { grid-template-columns:minmax(0,1fr); }
+  #content .archive-view .archive-row { align-items:flex-start; flex-wrap:wrap; }
+  #content .archive-view .archive-actions { width:100%; }
+}
