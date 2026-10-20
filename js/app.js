@@ -4939,14 +4939,13 @@ function visionTimelineHTML(st) {
     const covered = st.yearsCovered.indexOf(y) >= 0;
     const ys = NoorStore.yearStats(y);
     const current = y === st.curYear;
-    const label = current ? 'السنة الحالية' : (y < st.curYear ? 'سنة سابقة' : 'سنة مستقبلية');
     yline += `<button type="button" class="ycell ${covered ? 'ok' : 'gap'}${current ? ' cur' : ''}" onclick="jumpToVisionYear(${y})" title="الانتقال إلى السنة ${y}">
       <span class="ycell-top"><span class="ycell-number">${y}</span><span class="ycell-mark">${current ? 'أنت هنا' : (covered ? 'مخططة' : 'غير مخططة')}</span></span>
       <span class="ycell-bar"><i style="width:${Math.max(0, Math.min(100, ys.pct || 0))}%"></i></span>
       <span class="ycell-bottom"><span>${ys.goals.length} هدف</span><span>${ys.pct || 0}%</span></span>
     </button>`;
   }
-  return `<div class="vision-timeline-head"><div><h4 class="insight-h">خريطة السنوات</h4><p class="vision-timeline-desc">اختر أي سنة للانتقال مباشرة إلى أهدافها. ابدأ بالسنة الحالية ثم خطّط لما بعدها.</p></div><div class="vision-legend"><span><i class="legend-dot planned"></i> فيها أهداف</span><span><i class="legend-dot unplanned"></i> تحتاج تخطيطًا</span><span><i class="legend-dot current"></i> موقعك الحالي</span></div></div><div class="yline">${yline}</div>`;
+  return '<div class="yline">' + yline + '</div>';
 }
 
 /* محتوى النظرة الكامل: اللوحة العلوية ← الهوية ← عشوائيات ← الخط الزمني ← الهرم */
