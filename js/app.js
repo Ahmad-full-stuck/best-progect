@@ -5618,10 +5618,12 @@ function openPostDetails(id) {
     <div class="lib-detail">
       ${p.cover ? `<div class="lib-detail-cover"><img src="${cachedCover(p.cover)}" alt="" loading="lazy" onerror="this.closest('.lib-detail-cover').style.display='none'"></div>` : ''}
       <div class="lib-detail-body">
-        ${p.author ? `<div class="lib-detail-author">${esc(p.sub === 'video' ? 'الاسم' : 'المؤلف')}: ${esc(p.author)}</div>` : ''}
+        ${p.author ? `<div class="lib-detail-author">${esc(p.author)}${p.sub === 'source' ? '' : ' — ' + esc(p.sub === 'video' ? 'فيديو' : p.sub === 'book' ? 'المؤلف' : 'معرفة')}</div>` : ''}
         ${p.rating > 0 ? `<div class="lib-detail-rating">${starsHTML(p.rating)}</div>` : ''}
       </div>
     </div>` : '';
+  const safeSource = noorSafeUrl(p.link);
+  const sourceLinkHTML = safeSource ? `<div class="knowledge-source-open"><a class="btn btn-ghost" href="${esc(safeSource)}" target="_blank" rel="noopener noreferrer">فتح المصدر الأصلي ↗</a><span class="count">${esc(safeSource)}</span></div>` : '';
   openModal(`${m.icon || '📝'} ${esc(p.title)}`, `
     <div class="field" style="flex-direction:row;align-items:center;gap:8px;flex-wrap:wrap">
       ${p.sub ? `<span class="chip jchip">${esc(jTypeIcon(p.space, p.sub))} ${esc(jTypeTitle(p.space, p.sub))}</span>` : ''}
@@ -5630,6 +5632,7 @@ function openPostDetails(id) {
       ${date ? `<span class="count">${date}</span>` : ''}
     </div>
     ${libHead}
+    ${sourceLinkHTML}
     ${postBodyHTML(p)}
     ${isProj ? `
       <div class="jprog big"><div class="an-bar"><span class="an-fill" style="width:${pct}%;background:${m.color || NOOR_ACCENT}"></span></div><span class="gn-val">${done}/${total} خطوة · ${pct}%</span></div>
@@ -5678,18 +5681,26 @@ function openJournalModal(space, id, preSub) {
 
 /* حقول الوسائط (مؤلف/تقييم/غلاف) تظهر للكتب والفيديوهات فقط — التجارب مجرد كتابة */
 function knowledgeMediaFields(sub, p) {
-  if (sub !== 'book' && sub !== 'video') return '';
+  const isSource = sub === 'source';
   const isVideo = sub === 'video';
+  const hasRating = sub === 'book' || sub === 'video';
+  if (!isSource && !hasRating) return '';
   return `
-    <div class="field-row">
-      <div class="field"><label>${isVideo ? 'الاسم' : 'المؤلف'}</label><input class="input" id="post-author" value="${p ? esc(p.author) : ''}" placeholder="${isVideo ? 'القناة / المتحدث' : 'اسم المؤلف'}"></div>
+    ${isSource ? '' : `<div class="field-row">
+      <div class="field"><label>${isVideo ? 'القناة / المتحدث' : 'المؤلف'}</label><input class="input" id="post-author" value="${p ? esc(p.author) : ''}" placeholder="${isVideo ? 'اسم القناة أو المتحدث' : 'اسم المؤلف'}"></div>
       <div class="field"><label>التقييم (من 5 نجوم)</label>${starInputHTML(p ? p.rating : 0)}</div>
+    </div>`}
+    ${isSource ? `<div class="field"><label>اسم الموقع أو صاحب المصدر (اختياري)</label><input class="input" id="post-author" value="${p ? esc(p.author) : ''}" placeholder="اسم الموقع أو الكاتب"></div>` : ''}
+    <div class="field">
+      <label>${isSource ? 'رابط المصدر' : (isVideo ? 'رابط الفيديو أو قائمة التشغيل (اختياري)' : 'رابط الكتاب أو المرجع (اختياري)')}</label>
+      <input class="input" id="post-link" value="${p ? esc(p.link || '') : ''}" placeholder="https://…" dir="ltr" inputmode="url">
+      ${isSource ? '<p class="count">يُحفظ الرابط مع الملاحظات، ويمكن فتحه من بطاقة المصدر.</p>' : ''}
     </div>
     <div class="field"><label>صورة الغلاف (اختياري)</label>
-      <div class="field-row" style="align-items:center;gap:10px">
+      <div class="field-row cover-picker-row">
         <input type="file" id="post-cover-file" accept="image/*" style="display:none" onchange="handleCoverFile(this,'post-cover')">
-        <button class="btn btn-xs" onclick="$('#post-cover-file').click()">📂 صورة من الجهاز</button>
-        <input class="input" id="post-cover" value="${p ? esc(p.cover) : ''}" placeholder="أو رابط صورة" dir="ltr" style="flex:1">
+        <button type="button" class="btn btn-xs cover-picker-button" onclick="$('#post-cover-file').click()">📂 صورة من الجهاز</button>
+        <input class="input cover-url-input" id="post-cover" value="${p ? esc(p.cover) : ''}" placeholder="أو رابط صورة" dir="ltr">
       </div>
     </div>`;
 }
@@ -5715,6 +5726,11 @@ async function saveJournalPost() {
     const data = { space, title, text };
     if (sub) data.sub = sub;
     if ($('#post-cover')) data.cover = $('#post-cover').value.trim();
+    if ($('#post-link')) {
+      const rawLink = $('#post-link').value.trim();
+      if (rawLink && !noorSafeUrl(rawLink)) return showToast('الرابط غير صالح — استخدم رابطًا يبدأ بـ https:// أو http://', 'bad');
+      data.link = rawLink;
+    }
     if ($('#post-author')) data.author = $('#post-author').value.trim();
     if ($('#star-val')) data.rating = Number($('#star-val').value || 0);
     if (id) NoorStore.updatePost(id, data);
