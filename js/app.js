@@ -1634,6 +1634,7 @@ async function renderProjects() {
   };
 
   const html = `
+    <div class="projects-view">
     <div class="page-head">
       <div>
         <h2 class="page-title">المشاريع</h2>
@@ -1663,7 +1664,8 @@ async function renderProjects() {
         <button class="btn btn-xs btn-ghost" onclick="event.stopPropagation();toggleCompleteProject(${p.id})" title="إلغاء الإنجاز">↺</button>
       </div>`;
     }).join('')}` : ''}
-  `;
+  
+    </div>`;
   $('#content').innerHTML = html;
 }
 
@@ -2305,6 +2307,7 @@ async function renderLibrary() {
   }
 
   const html = `
+    <div class="library-view">
     <div class="page-head">
       <div>
         <h2 class="page-title">المكتبة الشخصية</h2>
@@ -2317,7 +2320,8 @@ async function renderLibrary() {
       </div>
     </div>
     ${heroCards}
-    ${body}`;
+    ${body}
+    </div>`;
   $('#content').innerHTML = html;
 }
 
@@ -3205,6 +3209,7 @@ async function renderTimer() {
     }
 
     const html = `
+      <div class="timer-view">
       <div class="timer-wrap ${hasMaterial ? 'has-study' : ''}">
         <div class="timer-main">
           <div class="card">
@@ -3265,6 +3270,7 @@ async function renderTimer() {
           </div>
         </div>
         <div class="timer-side" id="timer-side"></div>
+      </div>
       </div>`;
 
     $('#content').innerHTML = html;
@@ -4171,7 +4177,9 @@ async function renderStats() {
   const habits = NoorStore.getSimpleHabits();
   const today = NoorStore.todayStr();
   const RING_C = (2 * Math.PI * 42).toFixed(1);
-  const ringOffset = (RING_C * (1 - Math.min(100, ys.pct) / 100)).toFixed(1);
+  const settings = NoorStore.getSettings();
+  const weeklyTargetMin = Math.max(1, Number(settings.weekly_target_min) || (Number(st.daily_target_min) || 180) * 7);
+  const focusPct = Math.min(100, Math.round((Number(st.focus_min) || 0) / weeklyTargetMin * 100));
 
   /* === الشريط العلوي: إحصائيات سريعة مدمجة أفقياً === */
   const kpiStrip = `
@@ -4186,7 +4194,7 @@ async function renderStats() {
       </div>
       <div class="dash-kpi">
         <span class="dk-num">${(st.focus_min/60).toFixed(1)}<small>س</small></span><span class="dk-label">تركيز هذا الأسبوع</span>
-        <div class="dk-bar"><div class="dk-fill" style="width:${Math.min(100,st.pct)}%"></div></div>
+        <div class="dk-bar"><div class="dk-fill" style="width:${focusPct}%"></div></div>
       </div>
       <div class="dash-kpi">
         <span class="dk-num">${st.avg_focus_min}<small>د</small></span><span class="dk-label">متوسط يومي</span>
@@ -4196,7 +4204,7 @@ async function renderStats() {
 
   /* === الشبكة الشهرية: عادات × أيام (خانات مربعية) === */
   const habitRows = habits.slice(0, 15);
-  const daysInMonth = new Date(NoorStore.yearIndex(today), NoorStore.monthIndex ? NoorStore.monthIndex(today) + 1 : (new Date().getMonth()+1), 0).getDate();
+  const daysInMonth = new Date(Number(today.slice(0, 4)), Number(today.slice(5, 7)), 0).getDate();
   const curMonth = today.substring(0, 7);
   let monthGrid = '';
   if (habitRows.length) {
@@ -4204,7 +4212,7 @@ async function renderStats() {
     let dayHeaders = '';
     for (let d = 1; d <= daysInMonth; d++) {
       const ds = curMonth + '-' + String(d).padStart(2, '0');
-      const dow = new Date(ds).getDay();
+      const dow = new Date(ds + 'T00:00:00Z').getUTCDay();
       const isWeekend = dow === 5 || dow === 6;
       dayHeaders += `<div class="mg-h ${isWeekend?'wk':''}">${d}</div>`;
     }
@@ -4217,7 +4225,7 @@ async function renderStats() {
       const dayKeys = ['sun','mon','tue','wed','thu','fri','sat'];
       for (let d = 1; d <= daysInMonth; d++) {
         const ds = curMonth + '-' + String(d).padStart(2, '0');
-        const dow = dayKeys[new Date(ds).getDay()];
+        const dow = dayKeys[new Date(ds + 'T00:00:00Z').getUTCDay()];
         const isFuture = ds > today;
         if (allowed.length && allowed.indexOf(dow) < 0) {
           cells += '<div class="mg-c na"></div>';
@@ -4254,10 +4262,11 @@ async function renderStats() {
   }).join('');
 
   /* === الإحصاءات الشاملة مع الرسم الدائري === */
-  const totalGoal = (st.daily_target_min || 180) * 7;
+  const totalGoal = weeklyTargetMin;
   const totalActual = st.focus_min;
   const totalLeft = Math.max(0, totalGoal - totalActual);
   const overallPct = totalGoal > 0 ? Math.min(100, Math.round(totalActual / totalGoal * 100)) : 0;
+  const ringOffset = (RING_C * (1 - overallPct / 100)).toFixed(1);
 
   /* === أفضل العادات + أفضل المشاريع === */
   const topHabits = habits.slice(0, 10).map((h, i) => {
@@ -4267,7 +4276,7 @@ async function renderStats() {
     const dayKeys = ['sun','mon','tue','wed','thu','fri','sat'];
     for (let d = 1; d <= daysInMonth; d++) {
       const ds = curMonth + '-' + String(d).padStart(2, '0');
-      const dow = dayKeys[new Date(ds).getDay()];
+      const dow = dayKeys[new Date(ds + 'T00:00:00Z').getUTCDay()];
       if (ds > today) continue;
       if (allowed.length && allowed.indexOf(dow) < 0) continue;
       total++;
@@ -4288,6 +4297,7 @@ async function renderStats() {
     : `<div class="dash-sentence">${esc(st.sentence)}</div>`;
 
   $('#content').innerHTML = `
+    <div class="stats-view">
     <div class="page-head">
       <div>
         <h2 class="page-title">الإحصائيات</h2>
@@ -4337,7 +4347,7 @@ async function renderStats() {
           <div class="dash-card-head"><h3>📋 جدول التحليل — الأهداف والأداء</h3></div>
           <div class="dash-card-body">
             <table class="dash-table">
-              <thead><tr><th>الهدف</th><th>Goal</th><th>Actual</th><th>Left</th><th>Progress</th><th>%</th></tr></thead>
+              <thead><tr><th>الهدف</th><th>المتوقع</th><th>المنجز</th><th>المتبقي</th><th>التقدم</th><th>النسبة</th></tr></thead>
               <tbody>${analysisGoals}</tbody>
             </table>
           </div>
@@ -4356,6 +4366,7 @@ async function renderStats() {
           <div class="dash-card-body">${ys.goals.length ? ys.goals.map((g) => `<div class="an-row"><span class="goal-ic small" style="background:${esc(g.color)||NOOR_ACCENT}">${esc(g.icon||'◎')}</span><span class="an-label">${esc(g.title)}</span><span class="an-bar"><span class="an-fill" style="width:${g.pct}%;background:${esc(g.color)||NOOR_ACCENT}"></span></span><span class="an-val">${g.done}/${g.expected} · ${g.pct}%</span></div>`).join('') : '<div class="empty-box">لا أهداف</div>'}</div>
         </div>
       </div>
+    </div>
     </div>`;
 }
 
@@ -4501,6 +4512,7 @@ async function archiveDesire(id) {
 async function renderArchive() {
   const isHist = state.archiveMode === 'history';
   $('#content').innerHTML = `
+    <div class="archive-view">
     <div class="page-head">
       <div>
         <h2 class="page-title">الأرشيف</h2>
@@ -4511,7 +4523,8 @@ async function renderArchive() {
       <button class="jmode${!isHist ? ' on' : ''}" onclick="setArchiveMode('list')">📋 القائمة</button>
       <button class="jmode${isHist ? ' on' : ''}" onclick="setArchiveMode('history')">🗓 التاريخ</button>
     </div>
-    ${isHist ? renderArchiveHistory() : renderArchiveList()}`;
+    ${isHist ? renderArchiveHistory() : renderArchiveList()}
+    </div>`;
   if (isHist) requestAnimationFrame(() => {
     const tc = document.querySelector('.hist-cell.today');
     if (tc) tc.scrollIntoView({ block: 'center', inline: 'center' });
@@ -6580,6 +6593,7 @@ async function renderJournal() {
     await Promise.all([loadJournalBase(), ensureJournalToday()]);
     const body = journalMode === 'timeline' ? await renderJournalTimeline() : renderJournalSections();
     $('#content').innerHTML = `
+    <div class="journal-view">
     <div class="page-head">
       <div>
         <h2 class="page-title">التدوين الشامل</h2>
@@ -6595,7 +6609,8 @@ async function renderJournal() {
       <button class="jmode${journalMode === 'sections' ? ' on' : ''}" onclick="setJournalMode('sections')">🗂 المساحات</button>
       <button class="jmode${journalMode === 'timeline' ? ' on' : ''}" onclick="setJournalMode('timeline')">📅 التاريخ</button>
     </div>
-    ${body}`;
+    ${body}
+    </div>`;
   } catch (e) {
     console.error('renderJournal error:', e);
     $('#content').innerHTML = '<div class="error-box">خطأ في عرض التدوين: ' + esc(e.message) + '</div>';
