@@ -295,3 +295,26 @@ a:hover{color:var(--accent)}
 @media(prefers-reduced-motion:reduce){
  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+/* عرض المهام يعتمد على عرض نافذة التفاصيل نفسها، لا عرض المتصفح فقط */
+.modal { container-type: inline-size; }
+@container (max-width: 440px) {
+  .pt-list .project-task-row {
+    grid-template-columns: 22px minmax(0, 1fr);
+    grid-template-areas: "type title" "meta meta" "actions actions";
+    gap: 5px 8px;
+    padding: 10px;
+  }
+  .pt-list .project-task-row > .item-meta { padding-inline-start: 30px; }
+  .pt-list .project-task-row > .item-actions {
+    justify-content: flex-start;
+    padding-inline-start: 30px;
+    flex-wrap: wrap;
+  }
+  .pt-complete-btn { min-width: 78px; }
+}
+.pt-list .project-task-row.is-complete {
+  background: #F5F8F4;
+  border-color: #D9E6DA;
+}
+.pt-list .project-task-row.is-complete > .item-title { color: var(--ink-3); }
