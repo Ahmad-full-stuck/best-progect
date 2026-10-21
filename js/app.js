@@ -2119,7 +2119,7 @@ function openProjectTasksModal(pid) {
     <p class="count" style="display:block;margin:10px 0">المهام داخلية متسلسلة: التالية غير المنجزة تظهر فقط في الأيام المسموحة.</p>
     <div class="pt-list">
       ${p.tasks.length ? p.tasks.map((pt, idx) => `
-        <div class="settings-item project project-task-row">
+        <div class="settings-item project project-task-row${pt.completed_at ? ' is-complete' : ''}">
           <span class="item-type">${pt.completed_at ? '✓' : String(idx + 1)}</span>
           <span class="item-title">${esc(pt.title)}</span>
           <span class="item-meta">${pt.completed_at ? 'منجزة' : 'بالتسلسل'}${pt.hours > 0 ? ` · ⏱ ${pt.hours} ساعة` : ''}${pt.sources.length ? ` · ${pt.sources.length} 📦 مصدر` : ''}</span>
